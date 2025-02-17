@@ -1,0 +1,11 @@
+font_family             family="FiraCode Nerd Font"
+bold_font               family="FiraCode Nerd Font", style='Bold'
+italic_font             family='VictorMono Nerd Font' style='SemiBold Italic'
+bold_italic_font        family='VictorMono Nerd Font' style='Bold Italic'
+font_size               14.0
+disable_ligatures       never
+remember_window_size    no
+initial_window_width    100c
+initial_window_height   36c
+confirm_os_window_close 0
+window_padding_width 25
