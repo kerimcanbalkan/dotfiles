@@ -6,5 +6,10 @@
   (add-hook 'before-save-hook #'lsp-organize-imports t t))
 (add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
 
-;; Theme
+;; Epub reader
 (package! nov)
+(package! justify-kp
+  :recipe (:host github :repo "Fuco1/justify-kp"))
+
+;; Theme
+(package! zenburn-theme)
