@@ -119,45 +119,7 @@
 ;;   :custom      ; Set these variables
 ;;   :config      ; Run this code after my-package is loaded
 
-;; Minibuffer completion is essential to your Emacs workflow and
-;; Vertico is currently one of the best out there. There's a lot to
-;; dive in here so I recommend checking out the documentation for more
-;; details: https://elpa.gnu.org/packages/vertico.html. The short and
-;; sweet of it is that you search for commands with "M-x do-thing" and
-;; the minibuffer will show you a filterable list of matches.
-(use-package vertico
-  :ensure t
-  :custom
-  (vertico-cycle t)
-  (read-buffer-completion-ignore-case t)
-  (read-file-name-completion-ignore-case t)
-  (completion-styles '(basic substring partial-completion flex))
-  :init
-  (vertico-mode))
-
-;; Improve the accessibility of Emacs documentation by placing
-;; descriptions directly in your minibuffer. Give it a try:
-;; "M-x find-file".
-(use-package marginalia
-  :after vertico
-  :ensure t
-  :init
-  (marginalia-mode))
-
-;; Adds intellisense-style code completion at point that works great
-;; with LSP via Eglot. You'll likely want to configure this one to
-;; match your editing preferences, there's no one-size-fits-all
-;; solution.
-(use-package corfu
-  :ensure t
-  :init
-  (global-corfu-mode)
-  :custom
-  (corfu-auto t)
-  ;; You may want to play with delay/prefix/styles to suit your preferences.
-  (corfu-auto-delay 0)
-  (corfu-auto-prefix 0)
-  (completion-styles '(basic)));;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
 ;;;   Minibuffer and completion
 ;;;
@@ -252,7 +214,10 @@
 
 
 ;; Flymake configurations
+(require 'flymake)
 (setq flymake-show-diagnostics-at-end-of-line t)
+(define-key flymake-mode-map (kbd "M-n") 'flymake-goto-next-error)
+(define-key flymake-mode-map (kbd "M-p") 'flymake-goto-prev-error)
 
 ;; Add extra context to Emacs documentation to help make it easier to
 ;; search and understand. This configuration uses the keybindings 
@@ -313,10 +278,38 @@
   (web-mode-markup-indent-offset 2)
   (web-mode-enable-auto-quoting nil))
 
+;; Formating for javascript
+(use-package prettier
+  :ensure t
+  :hook ((web-mode . prettier-mode)
+         (typescript-mode . prettier-mode)))
+
+;; Treesitter support
+(use-package treesit-auto
+  :ensure t
+  :config
+  (setq treesit-auto-install 'prompt)
+  (global-treesit-auto-mode))
+
+
+(use-package typescript-mode
+  :ensure t
+  :mode ("\\.ts\\'" . typescript-mode)
+  :hook (typescript-mode . eglot-ensure))
+
+;; Project management
+(use-package project
+  :bind (("C-x p f" . project-find-file)
+         ("C-x p b" . project-switch-to-buffer)))
+
 ;; Packages for reading things
 (use-package nov
   :ensure t
   :init (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
 
 (use-package pdf-tools
+  :ensure t)
+
+;; Color theme
+(use-package gruber-darker-theme
   :ensure t)
