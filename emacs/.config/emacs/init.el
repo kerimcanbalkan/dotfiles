@@ -9,27 +9,33 @@
 (global-hl-line-mode 1)
 (pixel-scroll-precision-mode 1)
 (setq visible-bell 1)
-(load-theme 'modus-vivendi)
+
 (setopt inhibit-splash-screen t)
 (setopt make-backup-files nil)
 (setopt create-lockfiles nil)
 (set-fringe-mode 0)
 (add-to-list 'default-frame-alist '(undecorated . t))
 
+;; Color theme
+
+(setq modus-themes-bold-constructs t)
+(setq modus-themes-italic-constructs t)
+(setq modus-themes-mode-line '(borderless))
+(setq modus-themes-syntax '(faint alt-syntax green-strings yellow-comments))
+(setq modus-themes-headings
+      (quote ((1 . (variable-pitch 1.5))
+              (2 . (rainbow 1.3))
+              (3 . (1.1))
+              (t . (monochrome)))))
+(setq modus-themes-mixed-fonts t)
+
+(load-theme 'modus-vivendi)
+
 ;; Automatically reread from disk if the underlying files changes
 (setopt auto-revert-avoid-polling t)
 
 ;; Font
-(set-face-attribute 'default nil :font "RobotoMono Nerd Font" :height 120)
-
-;; --- Frame / windows layout & behavior --------------------------------------
-(setq default-frame-alist
-      '((height . 44) (width  . 81) (left-fringe . 0) (right-fringe . 0)
-        (internal-border-width . 32) (vertical-scroll-bars . nil)
-        (bottom-divider-width . 0) (right-divider-width . 0)
-        (undecorated-round . t)))
-(modify-frame-parameters nil default-frame-alist)
-(setq-default pop-up-windows nil)
+(set-face-attribute 'default nil :font "RobotoMono Nerd Font" :height 140)
 
 ;; Add unique buffer names in the minibuffer where there are many
 ;; identical files. This is super useful if you rely on folders for
@@ -39,6 +45,9 @@
 
 ;; Automatically insert closing parens
 (electric-pair-mode t)
+
+;; Indenting
+(electric-indent-mode t)
 
 ;; Visualize matching parens
 (show-paren-mode 1)
@@ -190,7 +199,7 @@
 ;; rust-analyzer to use Eglot with `rust-mode'.
 (use-package eglot
   :ensure t
-  :bind (("C-x gd" . eglot-find-implementation)
+  :bind (("C-x ?" . eglot-find-implementation)
          ("C-c ." . eglot-code-action-quickfix))
   ;; Add your programming modes here to automatically start Eglot,
   ;; assuming you have the respective LSP server installed.
@@ -225,6 +234,7 @@
 ;; An extremely feature-rich git client. Activate it with "C-c g".
 (use-package magit
   :ensure t
+  :defer t
   :bind (("C-c g" . magit-status)))
 
 ;; As you've probably noticed, Lisp has a lot of parentheses.
@@ -269,6 +279,17 @@
   (web-mode-markup-indent-offset 2)
   (web-mode-enable-auto-quoting nil))
 
+;; Emmet
+(use-package emmet-mode
+  :ensure t
+  :hook (web-mode . emmet-mode))
+
+;; Snippets
+(use-package yasnippet
+  :ensure t
+  :config
+  (yas-global-mode 1))
+
 ;; Formating for javascript
 (use-package prettier
   :ensure t
@@ -282,7 +303,7 @@
   (setq treesit-auto-install 'prompt)
   (global-treesit-auto-mode))
 
-
+;; Typescript support
 (use-package typescript-mode
   :ensure t
   :mode ("\\.ts\\'" . typescript-mode)
@@ -294,13 +315,31 @@
          ("C-x p b" . project-switch-to-buffer)))
 
 ;; Packages for reading things
+;; Epub
 (use-package nov
   :ensure t
   :init (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
 
+;; PDF
 (use-package pdf-tools
   :ensure t)
 
-;; Color theme
-(use-package gruber-darker-theme
-  :ensure t)
+;; Padding mode
+(use-package spacious-padding
+  :ensure t
+  :config
+  (spacious-padding-mode 1))
+
+;; Keybinds
+(global-set-key (kbd "C-x k") 'kill-this-buffer)  ; Close current buffer
+(global-set-key (kbd "C-x C-b") 'ibuffer)         ; Better buffer management
+(global-set-key (kbd "M-o") 'other-window)        ; Switch windows easily
+
+;; Editing text
+(use-package ace-jump-mode
+  :ensure t
+  :bind
+  (("C-c SPC" . ace-jump-mode)  ;; Jump anywhere
+   ("C-c j c" . ace-jump-char-mode)  ;; Jump to a specific character
+   ("C-c j w" . ace-jump-word-mode)  ;; Jump to a word
+   ("C-c j l" . ace-jump-line-mode)))  ;; Jump to a line
