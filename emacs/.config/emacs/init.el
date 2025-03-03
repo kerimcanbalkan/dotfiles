@@ -1,44 +1,35 @@
-;;; init.el --- Emacs configuration -*- lexical-binding: t -*-
-
-;;; Commentary:
-
-;; Save the contents of this file to ~/.config/emacs/init.el and
-;; you're ready to boot up Emacs.
-
-;; Hack this file! One of the best ways to get started with Emacs is
-;; to look at other peoples' configurations and extract the pieces
-;; that work for you. That's where this configuration started. I
-;; encourage you to read through the code in this file and explore the
-;; functions and variables using the built-in help system (details
-;; below). Happy hacking!
-
-;; "C-<chr>  means hold the CONTROL key while typing the character <chr>.
-;; Thus, C-f would be: hold the CONTROL key and type f." (Emacs tutorial)
-;;
-;; - C-h t: Start the Emacs tutorial
-;; - C-h o some-symbol: Describe symbol
-;; - C-h C-q: Pull up the quick-help cheatsheet
-
-;;; Code:
-
 ;; Performance tweaks for modern machines
-;;(setq gc-cons-threshold 100000000) ; 100 mb
-;;(setq read-process-output-max (* 1024 1024)) ; 1mb
+(setq gc-cons-threshold 100000000) ; 100 mb
+(setq read-process-output-max (* 1024 1024)) ; 1mb
 
 ;; Remove extra UI clutter by hiding the scrollbar, menubar, and toolbar.
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
-(load-theme 'tsdh-dark)
+(global-hl-line-mode 1)
+(pixel-scroll-precision-mode 1)
+(setq visible-bell 1)
+(load-theme 'modus-vivendi)
 (setopt inhibit-splash-screen t)
 (setopt make-backup-files nil)
 (setopt create-lockfiles nil)
+(set-fringe-mode 0)
+(add-to-list 'default-frame-alist '(undecorated . t))
 
 ;; Automatically reread from disk if the underlying files changes
 (setopt auto-revert-avoid-polling t)
 
-;; Set the font. Note: height = px * 100
+;; Font
 (set-face-attribute 'default nil :font "RobotoMono Nerd Font" :height 120)
+
+;; --- Frame / windows layout & behavior --------------------------------------
+(setq default-frame-alist
+      '((height . 44) (width  . 81) (left-fringe . 0) (right-fringe . 0)
+        (internal-border-width . 32) (vertical-scroll-bars . nil)
+        (bottom-divider-width . 0) (right-divider-width . 0)
+        (undecorated-round . t)))
+(modify-frame-parameters nil default-frame-alist)
+(setq-default pop-up-windows nil)
 
 ;; Add unique buffer names in the minibuffer where there are many
 ;; identical files. This is super useful if you rely on folders for
@@ -199,7 +190,7 @@
 ;; rust-analyzer to use Eglot with `rust-mode'.
 (use-package eglot
   :ensure t
-  :bind (("s-<mouse-1>" . eglot-find-implementation)
+  :bind (("C-x gd" . eglot-find-implementation)
          ("C-c ." . eglot-code-action-quickfix))
   ;; Add your programming modes here to automatically start Eglot,
   ;; assuming you have the respective LSP server installed.
