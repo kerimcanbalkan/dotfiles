@@ -1,6 +1,6 @@
-;; Performance tweaks for modern machines
-(setq gc-cons-threshold 100000000) ; 100 mb
-(setq read-process-output-max (* 1024 1024)) ; 1mb
+;;; Performance tweaks for modern machines
+(setq gc-cons-threshold 100000000)
+(setq read-process-output-max (* 1024 1024))
 
 ;; Remove extra UI clutter by hiding the scrollbar, menubar, and toolbar.
 (menu-bar-mode -1)
@@ -17,7 +17,6 @@
 (add-to-list 'default-frame-alist '(undecorated . t))
 
 ;; Color theme
-
 (setq modus-themes-bold-constructs t)
 (setq modus-themes-italic-constructs t)
 (setq modus-themes-mode-line '(borderless))
@@ -108,22 +107,7 @@
   (package-vc-install "https://github.com/slotThe/vc-use-package"))
 (require 'vc-use-package)
 
-;; A quick primer on the `use-package' function (refer to
-;; "C-h f use-package" for the full details).
-;;
-;; (use-package my-package-name
-;;   :ensure t    ; Ensure my-package is installed
-;;   :after foo   ; Load my-package after foo is loaded (seldom used)
-;;   :init        ; Run this code before my-package is loaded
-;;   :bind        ; Bind these keys to these functions
-;;   :custom      ; Set these variables
-;;   :config      ; Run this code after my-package is loaded
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;;   Minibuffer and completion
-;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Minibuffer and completion
 
 ;; Vertico: better vertical completion for minibuffer commands
 (use-package vertico
@@ -148,11 +132,12 @@
   :ensure t
   :init
   (global-corfu-mode)
-  :bind
-  (:map corfu-map
-        ("SPC" . corfu-insert-separator)
-        ("C-n" . corfu-next)
-        ("C-p" . corfu-previous)))
+  :custom
+  ;; You may want to play with delay/prefix/styles to suit your preferences.
+  (corfu-auto-delay 0)
+  (corfu-auto-prefix 0)
+  (completion-styles '(orderless basic)))
+
 
 ;; Part of corfu
 (use-package corfu-popupinfo
@@ -199,7 +184,7 @@
 ;; rust-analyzer to use Eglot with `rust-mode'.
 (use-package eglot
   :ensure t
-  :bind (("C-x ?" . eglot-find-implementation)
+  :bind (("s-<mouse-1>" . eglot-find-implementation)
          ("C-c ." . eglot-code-action-quickfix))
   ;; Add your programming modes here to automatically start Eglot,
   ;; assuming you have the respective LSP server installed.
@@ -210,14 +195,21 @@
   ;; `eglot-server-programs'. The following tells eglot to use TypeScript
   ;; language server when working in `web-mode'.
   (add-to-list 'eglot-server-programs
-               '(web-mode . ("typescript-language-server" "--stdio"))))
-
+               '(web-mode . ("typescript-language-server" "--stdio"))
+               '(web-mode . ("tailwindcss-language-server" "--stdio"))))
 
 ;; Flymake configurations
-(require 'flymake)
-(setq flymake-show-diagnostics-at-end-of-line t)
-(define-key flymake-mode-map (kbd "M-n") 'flymake-goto-next-error)
-(define-key flymake-mode-map (kbd "M-p") 'flymake-goto-prev-error)
+(use-package flymake
+  :ensure nil ;; Flymake is built into Emacs, so no need to install it
+  :custom
+  (flymake-show-diagnostics-at-end-of-line 1)
+  :hook
+  (prog-mode . flymake-mode)
+  (flymake-mode . eldoc-mode)
+  :bind
+  (:map flymake-mode-map
+        ("M-n" . flymake-goto-next-error)
+        ("M-p" . flymake-goto-prev-error)))
 
 ;; Add extra context to Emacs documentation to help make it easier to
 ;; search and understand. This configuration uses the keybindings 
@@ -290,12 +282,6 @@
   :config
   (yas-global-mode 1))
 
-;; Formating for javascript
-(use-package prettier
-  :ensure t
-  :hook ((web-mode . prettier-mode)
-         (typescript-mode . prettier-mode)))
-
 ;; Treesitter support
 (use-package treesit-auto
   :ensure t
@@ -342,4 +328,6 @@
   (("C-c SPC" . ace-jump-mode)  ;; Jump anywhere
    ("C-c j c" . ace-jump-char-mode)  ;; Jump to a specific character
    ("C-c j w" . ace-jump-word-mode)  ;; Jump to a word
-   ("C-c j l" . ace-jump-line-mode)))  ;; Jump to a line
+   ("C-c j l" . ace-jump-line-mode)))
+
+;;; init.el ends here
