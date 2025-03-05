@@ -8,7 +8,14 @@
 (scroll-bar-mode -1)
 (global-hl-line-mode 1)
 (pixel-scroll-precision-mode 1)
+(blink-cursor-mode -1)
 (setq visible-bell 1)
+
+;; Emacs defaults change
+(setq make-backup-files nil)
+(setq auto-save-default nil)
+
+
 
 (setopt inhibit-splash-screen t)
 (setopt make-backup-files nil)
@@ -270,11 +277,6 @@
   (web-mode-css-indent-offset 2)
   (web-mode-markup-indent-offset 2)
   (web-mode-enable-auto-quoting nil))
-
-;; Emmet
-(use-package emmet-mode
-  :ensure t
-  :hook (web-mode . emmet-mode))
 
 ;; Snippets
 (use-package yasnippet
