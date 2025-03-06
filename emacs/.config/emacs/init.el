@@ -357,7 +357,6 @@
 
 
 ;;; Flymake
-
 (setq flymake-fringe-indicator-position 'left-fringe)
 (setq flymake-show-diagnostics-at-end-of-line nil)
 
@@ -367,5 +366,9 @@
 ;; Disable wrapping around when navigating Flymake errors.
 (setq flymake-wrap-around nil)
 
+;; Mood line
+(use-package mood-line
+  :ensure t
+  :init
+  (mood-line-mode))
 ;;; init.el ends here
-
