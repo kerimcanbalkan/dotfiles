@@ -14,14 +14,13 @@
 ;; Emacs defaults change
 (setq make-backup-files nil)
 (setq auto-save-default nil)
-
-
-
 (setopt inhibit-splash-screen t)
 (setopt make-backup-files nil)
 (setopt create-lockfiles nil)
 (set-fringe-mode 0)
 (add-to-list 'default-frame-alist '(undecorated . t))
+(setq next-line-add-newlines t);; C-n creates new line
+(setq use-short-answers t) ;; y-n instead of yes-no
 
 ;; Color theme
 (setq modus-themes-bold-constructs t)
@@ -29,7 +28,7 @@
 (setq modus-themes-mode-line '(borderless))
 (setq modus-themes-syntax '(faint alt-syntax green-strings yellow-comments))
 (setq modus-themes-headings
-      (quote ((1 . (variable-pitch 1.5))
+      (quote ((1 . (variable-pitch 1.4))
               (2 . (rainbow 1.3))
               (3 . (1.1))
               (t . (monochrome)))))
@@ -332,4 +331,9 @@
    ("C-c j w" . ace-jump-word-mode)  ;; Jump to a word
    ("C-c j l" . ace-jump-line-mode)))
 
+;; Org mode settings
+(setq org-log-done 'time)
+(setq org-agenda-files '("~/org/agenda.org"))
+
 ;;; init.el ends here
+
