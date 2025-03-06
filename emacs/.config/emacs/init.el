@@ -335,5 +335,37 @@
 (setq org-log-done 'time)
 (setq org-agenda-files '("~/org/agenda.org"))
 
+;; Eglot optimization from minimal-emacs
+;;; Eglot
+
+(setq eglot-sync-connect 1
+      eglot-autoshutdown t)
+
+;; Activate Eglot in cross-referenced non-project files
+(setq eglot-extend-to-xref t)
+
+;; Eglot optimization
+(setq jsonrpc-event-hook nil)
+(setq eglot-events-buffer-size 0)
+(setq eglot-report-progress nil)  ; Prevent Eglot minibuffer spam
+
+;; Eglot optimization: Disable `eglot-events-buffer' to maintain consistent
+;; performance in long-running Emacs sessions. By default, it retains 2,000,000
+;; lines, and each new event triggers pretty-printing of the entire buffer,
+;; leading to a gradual performance decline.
+(setq eglot-events-buffer-config '(:size 0 :format full))
+
+
+;;; Flymake
+
+(setq flymake-fringe-indicator-position 'left-fringe)
+(setq flymake-show-diagnostics-at-end-of-line nil)
+
+;; Suppress the display of Flymake error counters when there are no errors.
+(setq flymake-suppress-zero-counters t)
+
+;; Disable wrapping around when navigating Flymake errors.
+(setq flymake-wrap-around nil)
+
 ;;; init.el ends here
 
