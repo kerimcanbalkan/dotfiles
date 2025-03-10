@@ -19,7 +19,6 @@
 (setopt create-lockfiles nil)
 (set-fringe-mode 0)
 (add-to-list 'default-frame-alist '(undecorated . t))
-(setq next-line-add-newlines t);; C-n creates new line
 (setq use-short-answers t) ;; y-n instead of yes-no
 
 ;; Color theme
@@ -28,7 +27,7 @@
 (setq modus-themes-mode-line '(borderless))
 (setq modus-themes-syntax '(faint alt-syntax green-strings yellow-comments))
 (setq modus-themes-headings
-      (quote ((1 . (variable-pitch 1.4))
+      (quote ((1 . (variable-pitch 2.0))
               (2 . (rainbow 1.3))
               (3 . (1.1))
               (t . (monochrome)))))
@@ -42,10 +41,7 @@
 ;; Font
 (set-face-attribute 'default nil :font "RobotoMono Nerd Font" :height 140)
 
-;; Add unique buffer names in the minibuffer where there are many
-;; identical files. This is super useful if you rely on folders for
-;; organization and have lots of files with the same name,
-;; e.g. foo/index.ts and bar/index.ts.
+;; Add unique buffer names in the minibuffer.
 (require 'uniquify)
 
 ;; Automatically insert closing parens
@@ -84,36 +80,25 @@
       backup-by-copying t
       ;; Backups are placed into your Emacs directory, e.g. ~/.config/emacs/backups
       backup-directory-alist `(("." . ,(concat user-emacs-directory "backups")))
-      ;; I'll add an extra note here since user customizations are important.
-      ;; Emacs actually offers a UI-based customization menu, "M-x customize".
-      ;; You can use this menu to change variable values across Emacs. By default,
-      ;; changing a variable will write to your init.el automatically, mixing
-      ;; your hand-written Emacs Lisp with automatically-generated Lisp from the
-      ;; customize menu. The following setting instead writes customizations to a
-      ;; separate file, custom.el, to keep your init.el clean.
       custom-file (expand-file-name "custom.el" user-emacs-directory))
 
 ;; Bring in package utilities so we can install packages from the web.
 (require 'package)
 
-;; Add MELPA, an unofficial (but well-curated) package registry to the
-;; list of accepted package registries. By default Emacs only uses GNU
-;; ELPA and NonGNU ELPA, https://elpa.gnu.org/ and
-;; https://elpa.nongnu.org/ respectively.
+;; Add MELPA, an unofficial
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 
-;; Unless we've already fetched (and cached) the package archives,
-;; refresh them.
+;; Unless we've already fetched (and cached) the package archives, refresh them.
 (unless package-archive-contents
   (package-refresh-contents))
 
-;; Add the :vc keyword to use-package, making it easy to install
-;; packages directly from git repositories.
-(unless (package-installed-p 'vc-use-package)
-  (package-vc-install "https://github.com/slotThe/vc-use-package"))
-(require 'vc-use-package)
+;; Hope this works for fucking env variables.
+(use-package exec-path-from-shell
+  :ensure t
+  :config
+  (exec-path-from-shell-initialize))
 
-;; Minibuffer and completion
+;;; Minibuffer completion
 
 ;; Vertico: better vertical completion for minibuffer commands
 (use-package vertico
@@ -133,51 +118,23 @@
   :config
   (marginalia-mode))
 
-;; Popup completion-at-point
-(use-package corfu
+;; Company mode
+(use-package company
   :ensure t
-  :init
-  (global-corfu-mode)
+  :hook (after-init . global-company-mode)
   :custom
-  ;; You may want to play with delay/prefix/styles to suit your preferences.
-  (corfu-auto-delay 0)
-  (corfu-auto-prefix 0)
-  (completion-styles '(orderless basic)))
+  (company-idle-delay 0.2)
+  (company-minimum-prefix-length 2)
+  (company-tooltip-align-annotations t)
+  (company-selection-wrap-around t))
 
-
-;; Part of corfu
-(use-package corfu-popupinfo
-  :after corfu
-  :hook (corfu-mode . corfu-popupinfo-mode)
-  :custom
-  (corfu-popupinfo-delay '(0.25 . 0.1))
-  (corfu-popupinfo-hide nil)
-  :config
-  (corfu-popupinfo-mode))
-
-;; Make corfu popup come up in terminal overlay
-(use-package corfu-terminal
-  :if (not (display-graphic-p))
-  :ensure t
-  :config
-  (corfu-terminal-mode))
 
 ;; Fancy completion-at-point functions; there's too much in the cape package to
-;; configure here; dive in when you're comfortable!
 (use-package cape
   :ensure t
   :init
   (add-to-list 'completion-at-point-functions #'cape-dabbrev)
   (add-to-list 'completion-at-point-functions #'cape-file))
-
-;; Pretty icons for corfu
-(use-package kind-icon
-  :if (display-graphic-p)
-  :ensure t
-  :after corfu
-  :config
-  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
-
 
 ;; Orderless: powerful completion style
 (use-package orderless
@@ -185,41 +142,7 @@
   :config
   (setq completion-styles '(orderless)))
 
-;; Adds LSP support. Note that you must have the respective LSP
-;; server installed on your machine to use it with Eglot. e.g.
-;; rust-analyzer to use Eglot with `rust-mode'.
-(use-package eglot
-  :ensure t
-  :bind (("s-<mouse-1>" . eglot-find-implementation)
-         ("C-c ." . eglot-code-action-quickfix))
-  ;; Add your programming modes here to automatically start Eglot,
-  ;; assuming you have the respective LSP server installed.
-  :hook ((go-mode . eglot-ensure)
-         (web-mode . eglot-ensure))
-  :config
-  ;; You can configure additional LSP servers by modifying
-  ;; `eglot-server-programs'. The following tells eglot to use TypeScript
-  ;; language server when working in `web-mode'.
-  (add-to-list 'eglot-server-programs
-               '(web-mode . ("typescript-language-server" "--stdio"))
-               '(web-mode . ("tailwindcss-language-server" "--stdio"))))
-
-;; Flymake configurations
-(use-package flymake
-  :ensure nil ;; Flymake is built into Emacs, so no need to install it
-  :custom
-  (flymake-show-diagnostics-at-end-of-line 1)
-  :hook
-  (prog-mode . flymake-mode)
-  (flymake-mode . eldoc-mode)
-  :bind
-  (:map flymake-mode-map
-        ("M-n" . flymake-goto-next-error)
-        ("M-p" . flymake-goto-prev-error)))
-
-;; Add extra context to Emacs documentation to help make it easier to
-;; search and understand. This configuration uses the keybindings 
-;; recommended by the package author.
+;; Add extra context to Emacs documentation to help make it easier to understand Emacs.
 (use-package helpful
   :ensure t
   :bind (("C-h f" . #'helpful-callable)
@@ -235,19 +158,7 @@
   :defer t
   :bind (("C-c g" . magit-status)))
 
-;; As you've probably noticed, Lisp has a lot of parentheses.
-;; Maintaining the syntactical correctness of these parentheses
-;; can be a pain when you're first getting started with Lisp,
-;; especially when you're fighting the urge to break up groups
-;; of closing parens into separate lines. Luckily we have
-;; Paredit, a package that maintains the structure of your
-;; parentheses for you. At first, Paredit might feel a little
-;; odd; you'll probably need to look at a tutorial (linked
-;; below) or read the docs before you can use it effectively.
-;; But once you pass that initial barrier you'll write Lisp
-;; code like it's second nature.
-;; http://danmidwood.com/content/2014/11/21/animated-paredit.html
-;; https://stackoverflow.com/a/5243421/3606440
+;; Helps with parenthesis while working with lisp.
 (use-package paredit
   :ensure t
   :hook ((emacs-lisp-mode . enable-paredit-mode)
@@ -256,26 +167,92 @@
          (lisp-interaction-mode . enable-paredit-mode)
          (scheme-mode . enable-paredit-mode)))
 
+;;; Programming stuff
+;; Adds LSP support.
+(use-package eglot
+  :ensure t
+  :bind (("s-<mouse-1>" . eglot-find-implementation)
+         ("C-c ." . eglot-code-action-quickfix))
+  ;; Add your programming modes here to automatically start Eglot,
+  :hook ((js-mode . eglot-ensure)
+         (go-mode . eglot-ensure)
+         (js-ts-mode . eglot-ensure)
+         (tsx-ts-mode . eglot-ensure)
+         (typescript-ts-mode . eglot-ensure)
+         (html-mode . eglot-ensure)
+         (css-mode . eglot-ensure)
+)
+  :config
+    (add-to-list 'eglot-server-programs
+                      '((html-mode css-mode) . ("vscode-html-language-server" "--stdio")))
+    (add-to-list 'eglot-server-programs
+                 '((js-mode js-ts-mode tsx-ts-mode typescript-ts-mode)
+                   . ("typescript-language-server" "--stdio"))))
+
+;; Enable tsx-ts-mode for .tsx and .jsx files
+(add-to-list 'auto-mode-alist '("\\.tsx\\'" . tsx-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.jsx\\'" . js-ts-mode))
+
+;; Eglot optimization from minimal-emacs
+;;; Eglot
+(setq eglot-sync-connect 1
+      eglot-autoshutdown t)
+
+;; Activate Eglot in cross-referenced non-project files
+(setq eglot-extend-to-xref t)
+
+;; Eglot optimization
+(setq eglot-events-buffer-size 0)
+(setq eglot-report-progress nil)  ; Prevent Eglot minibuffer spam
+
+
+;; Rainbow-mode for CSS color previews in JSX/TSX
+(use-package rainbow-mode
+  :ensure t
+  :hook ((css-mode tsx-ts-mode js-ts-mode) . rainbow-mode))
+
+;; Emmet-mode for auto-closing HTML/JSX tags
+(use-package emmet-mode
+  :ensure t
+  :hook ((tsx-ts-mode js-ts-mode html-mode) . emmet-mode))
+
+
+;; Set up indentation for JavaScript/TypeScript
+(setq-default indent-tabs-mode nil) ;; Use spaces instead of tabs
+(setq-default js-indent-level 2) ;; JavaScript indentation
+(setq-default typescript-ts-mode-indent-offset 2) ;; TypeScript indentation
+(setq-default tsx-ts-mode-indent-offset 2) ;; TSX indentation
+
+
+;; Flymake configurations
+(use-package flymake
+  :custom
+  (flymake-show-diagnostics-at-end-of-line 1)
+  :hook
+  (prog-mode . flymake-mode)
+  (flymake-mode . eldoc-mode)
+  :bind
+  (:map flymake-mode-map
+        ("M-n" . flymake-goto-next-error)
+        ("M-p" . flymake-goto-prev-error)))
+
+(setq flymake-fringe-indicator-position 'left-fringe)
+
+;; Suppress the display of Flymake error counters when there are no errors.
+(setq flymake-suppress-zero-counters t)
+
+;; Disable wrapping around when navigating Flymake errors.
+(setq flymake-wrap-around nil)
+;; Go programming
 (use-package go-mode
   :ensure t
   :bind (:map go-mode-map
 	      ("C-c C-f" . 'gofmt))
   :hook (before-save . gofmt-before-save))
 
-;; TypeScript, JS, and JSX/TSX support.
-(use-package web-mode
-  :ensure t
-  :mode (("\\.ts\\'" . web-mode)
-         ("\\.js\\'" . web-mode)
-         ("\\.mjs\\'" . web-mode)
-         ("\\.tsx\\'" . web-mode)
-         ("\\.jsx\\'" . web-mode))
-  :custom
-  (web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'")))
-  (web-mode-code-indent-offset 2)
-  (web-mode-css-indent-offset 2)
-  (web-mode-markup-indent-offset 2)
-  (web-mode-enable-auto-quoting nil))
+;; For json files
+(use-package json-mode
+  :ensure t)
 
 ;; Snippets
 (use-package yasnippet
@@ -286,15 +263,10 @@
 ;; Treesitter support
 (use-package treesit-auto
   :ensure t
-  :config
+  :custom
   (setq treesit-auto-install 'prompt)
+  :config
   (global-treesit-auto-mode))
-
-;; Typescript support
-(use-package typescript-mode
-  :ensure t
-  :mode ("\\.ts\\'" . typescript-mode)
-  :hook (typescript-mode . eglot-ensure))
 
 ;; Project management
 (use-package project
@@ -311,18 +283,25 @@
 (use-package pdf-tools
   :ensure t)
 
+;;; UI
 ;; Padding mode
 (use-package spacious-padding
   :ensure t
   :config
   (spacious-padding-mode 1))
 
-;; Keybinds
+;; Mood line
+(use-package mood-line
+  :ensure t
+  :init
+  (mood-line-mode))
+
+;;; Keybindings
 (global-set-key (kbd "C-x k") 'kill-this-buffer)  ; Close current buffer
 (global-set-key (kbd "C-x C-b") 'ibuffer)         ; Better buffer management
 (global-set-key (kbd "M-o") 'other-window)        ; Switch windows easily
 
-;; Editing text
+;;; Editing text
 (use-package ace-jump-mode
   :ensure t
   :bind
@@ -334,41 +313,13 @@
 ;; Org mode settings
 (setq org-log-done 'time)
 (setq org-agenda-files '("~/org/agenda.org"))
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((js . t)))
 
-;; Eglot optimization from minimal-emacs
-;;; Eglot
-
-(setq eglot-sync-connect 1
-      eglot-autoshutdown t)
-
-;; Activate Eglot in cross-referenced non-project files
-(setq eglot-extend-to-xref t)
-
-;; Eglot optimization
-(setq jsonrpc-event-hook nil)
-(setq eglot-events-buffer-size 0)
-(setq eglot-report-progress nil)  ; Prevent Eglot minibuffer spam
-
-;; Eglot optimization: Disable `eglot-events-buffer' to maintain consistent
-;; performance in long-running Emacs sessions. By default, it retains 2,000,000
-;; lines, and each new event triggers pretty-printing of the entire buffer,
-;; leading to a gradual performance decline.
-(setq eglot-events-buffer-config '(:size 0 :format full))
-
-
-;;; Flymake
-(setq flymake-fringe-indicator-position 'left-fringe)
-(setq flymake-show-diagnostics-at-end-of-line nil)
-
-;; Suppress the display of Flymake error counters when there are no errors.
-(setq flymake-suppress-zero-counters t)
-
-;; Disable wrapping around when navigating Flymake errors.
-(setq flymake-wrap-around nil)
-
-;; Mood line
-(use-package mood-line
+;;; Note Taking
+(use-package denote
   :ensure t
-  :init
-  (mood-line-mode))
+  :config
+  (setq denote-directory (expand-file-name "~/Notes/")))
 ;;; init.el ends here
