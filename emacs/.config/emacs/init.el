@@ -176,6 +176,7 @@
   ;; Add your programming modes here to automatically start Eglot,
   :hook ((js-mode . eglot-ensure)
          (go-mode . eglot-ensure)
+         (common-lisp-mode . eglot-ensure)
          (js-ts-mode . eglot-ensure)
          (tsx-ts-mode . eglot-ensure)
          (typescript-ts-mode . eglot-ensure)
@@ -252,6 +253,10 @@
 
 ;; For json files
 (use-package json-mode
+  :ensure t)
+
+;; Common lisp development
+(use-package sly
   :ensure t)
 
 ;; Snippets
