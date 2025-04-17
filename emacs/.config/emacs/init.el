@@ -110,7 +110,7 @@
 (use-package vertico-directory
   :after vertico
   :bind (:map vertico-map
-              ("<backspace>" . vertico-directory-delete-word)))
+              ("<backspace>" . vertico-directory-delete-char)))
 
 ;; Marginalia: annotations for minibuffer
 (use-package marginalia
