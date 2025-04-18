@@ -202,6 +202,16 @@
 ;; Activate Eglot in cross-referenced non-project files
 (setq eglot-extend-to-xref t)
 
+;; Project management
+(use-package project
+  :bind
+  (("C-c f" . project-find-file)
+   ("C-c p" . project-switch-project)
+   ("C-c d" . project-find-dir)
+   ("C-c s" . project-shell)
+   ("C-c k" . project-kill-buffers)))
+
+
 ;; Eglot optimization
 (setq eglot-events-buffer-size 0)
 (setq eglot-report-progress nil)  ; Prevent Eglot minibuffer spam
