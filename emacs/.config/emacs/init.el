@@ -173,7 +173,6 @@
   :ensure t
   :bind (("s-<mouse-1>" . eglot-find-implementation)
          ("C-c ." . eglot-code-action-quickfix))
-  ;; Add your programming modes here to automatically start Eglot,
   :hook ((js-mode . eglot-ensure)
          (go-mode . eglot-ensure)
          (common-lisp-mode . eglot-ensure)
@@ -181,14 +180,15 @@
          (tsx-ts-mode . eglot-ensure)
          (typescript-ts-mode . eglot-ensure)
          (html-mode . eglot-ensure)
-         (css-mode . eglot-ensure)
-)
+         (css-mode . eglot-ensure))
   :config
-    (add-to-list 'eglot-server-programs
-                      '((html-mode css-mode) . ("vscode-html-language-server" "--stdio")))
-    (add-to-list 'eglot-server-programs
-                 '((js-mode js-ts-mode tsx-ts-mode typescript-ts-mode)
-                   . ("typescript-language-server" "--stdio"))))
+  (add-to-list 'eglot-server-programs
+               '((html-mode css-mode) . ("vscode-html-language-server" "--stdio")))
+  (add-to-list 'eglot-server-programs
+               '((js-mode js-ts-mode tsx-ts-mode typescript-ts-mode)
+                 . ("typescript-language-server" "--stdio")))
+  (add-to-list 'eglot-server-programs
+               '(go-mode . ("gopls"))))
 
 ;; Enable tsx-ts-mode for .tsx and .jsx files
 (add-to-list 'auto-mode-alist '("\\.tsx\\'" . tsx-ts-mode))
@@ -239,6 +239,9 @@
 (use-package flymake
   :custom
   (flymake-show-diagnostics-at-end-of-line 1)
+  (flymake-fringe-indicator-position 'left-fringe)
+  (flymake-suppress-zero-counters t)
+  (flymake-wrap-around nil)
   :hook
   (prog-mode . flymake-mode)
   (flymake-mode . eldoc-mode)
@@ -247,19 +250,16 @@
         ("M-n" . flymake-goto-next-error)
         ("M-p" . flymake-goto-prev-error)))
 
-(setq flymake-fringe-indicator-position 'left-fringe)
-
-;; Suppress the display of Flymake error counters when there are no errors.
-(setq flymake-suppress-zero-counters t)
-
-;; Disable wrapping around when navigating Flymake errors.
-(setq flymake-wrap-around nil)
-;; Go programming
 (use-package go-mode
-  :ensure t
-  :bind (:map go-mode-map
-	      ("C-c C-f" . 'gofmt))
-  :hook (before-save . gofmt-before-save))
+  :hook ((go-mode . go-mode-setup))
+  :config
+  (defun go-mode-setup ()
+    (setq compile-command "go build -v && go test -v && go vet")
+    (define-key (current-local-map) (kbd "C-c C-c") #'compile)
+    (setq gofmt-command "goimports")
+    (add-hook 'before-save-hook #'gofmt-before-save nil t)
+    (local-set-key (kbd "M-.") #'godef-jump)))
+
 
 ;; For json files
 (use-package json-mode
