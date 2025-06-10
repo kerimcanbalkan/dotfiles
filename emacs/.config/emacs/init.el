@@ -45,7 +45,7 @@
 (setopt auto-revert-avoid-polling t)
 
 ;; Font
-(set-face-attribute 'default nil :font "RobotoMono Nerd Font" :height 140)
+(set-face-attribute 'default nil :font "RobotoMono Nerd Font" :height 120)
 
 ;; Add unique buffer names in the minibuffer.
 (require 'uniquify)
@@ -107,11 +107,6 @@
   :init
   ;; You'll want to make sure that e.g. fido-mode isn't enabled
   (vertico-mode))
-
-(use-package vertico-directory
-  :after vertico
-  :bind (:map vertico-map
-              ("<backspace>" . vertico-directory-delete-char)))
 
 ;; Marginalia: annotations for minibuffer
 (use-package marginalia
@@ -330,7 +325,7 @@
   (mood-line-mode))
 
 ;;; Keybindings
-(global-set-key (kbd "C-x k") 'kill-this-buffer)  ; Close current buffer
+(global-set-key (kbd "C-x k") (lambda () (interactive) (kill-this-buffer))) ;; Kill current buffer
 (global-set-key (kbd "C-x C-b") 'ibuffer)         ; Better buffer management
 (global-set-key (kbd "M-o") 'other-window)        ; Switch windows easily
 
