@@ -1,6 +1,26 @@
  ;;; Performance tweaks for modern machines
-(setq gc-cons-threshold 100000000k)
+(setq gc-cons-threshold 100000000)
 (setq read-process-output-max (* 1024 1024))
+
+;; Package Setup
+(require 'package)
+(setq package-enable-at-startup nil)
+(setq package-archives
+      '(("melpa" . "https://melpa.org/packages/")
+        ("gnu" . "https://elpa.gnu.org/packages/")))
+(package-initialize)
+
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+
+(require 'use-package)
+(setq use-package-always-ensure t)
+
+;; Load custom.el if it exists
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+(when (file-exists-p custom-file)
+  (load custom-file))
 
 ;; Remove extra UI clutter by hiding the scrollbar, menubar, and toolbar.
 (menu-bar-mode -1)
@@ -67,16 +87,6 @@
       ;; Backups are placed into your Emacs directory, e.g. ~/.config/emacs/backups
       backup-directory-alist `(("." . ,(concat user-emacs-directory "backups")))
       custom-file (expand-file-name "custom.el" user-emacs-directory))
-
-;; Bring in package utilities so we can install packages from the web.
-(require 'package)
-
-;; Add MELPA, an unofficial
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
-
-;; Unless we've already fetched (and cached) the package archives, refresh them.
-(unless package-archive-contents
-  (package-refresh-contents))
 
 ;; Hope this works for fucking env variables.
 (use-package exec-path-from-shell
