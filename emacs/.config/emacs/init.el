@@ -1,5 +1,5 @@
-;;; Performance tweaks for modern machines
-(setq gc-cons-threshold 100000000)
+ ;;; Performance tweaks for modern machines
+(setq gc-cons-threshold 100000000k)
 (setq read-process-output-max (* 1024 1024))
 
 ;; Remove extra UI clutter by hiding the scrollbar, menubar, and toolbar.
@@ -20,20 +20,6 @@
 (set-fringe-mode 0)
 (add-to-list 'default-frame-alist '(undecorated . t))
 (setq use-short-answers t) ;; y-n instead of yes-no
-
-;; Color theme
-(setq modus-themes-bold-constructs t)
-(setq modus-themes-italic-constructs t)
-(setq modus-themes-mode-line '(borderless))
-(setq modus-themes-syntax '(faint alt-syntax green-strings yellow-comments))
-(setq modus-themes-headings
-      (quote ((1 . (variable-pitch 2.0))
-              (2 . (rainbow 1.3))
-              (3 . (1.1))
-              (t . (monochrome)))))
-(setq modus-themes-mixed-fonts t)
-
-(load-theme 'modus-vivendi)
 
 ;; Automatically reread from disk if the underlying files changes
 (setopt auto-revert-avoid-polling t)
@@ -97,6 +83,11 @@
   :ensure t
   :config
   (exec-path-from-shell-initialize))
+
+;; Set Theme
+(use-package color-theme-sanityinc-tomorrow
+  :ensure t
+  :config (load-theme 'sanityinc-tomorrow-bright t))
 
 ;;; Minibuffer completion
 
