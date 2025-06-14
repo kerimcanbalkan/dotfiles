@@ -176,7 +176,8 @@
          (tsx-ts-mode . eglot-ensure)
          (typescript-ts-mode . eglot-ensure)
          (html-mode . eglot-ensure)
-         (css-mode . eglot-ensure))
+         (css-mode . eglot-ensure)
+         (rust-mode . eglot-ensure))
   :config
   (add-to-list 'eglot-server-programs
                '((html-mode css-mode) . ("vscode-html-language-server" "--stdio")))
@@ -256,6 +257,16 @@
     (add-hook 'before-save-hook #'gofmt-before-save nil t)
     (local-set-key (kbd "M-.") #'godef-jump)))
 
+(use-package rust-mode
+  :ensure t
+  :config
+  (setq rust-format-on-save t)
+  (add-hook 'rust-mode-hook
+            (lambda () (setq indent-tabs-mode nil)))
+  (add-hook 'rust-mode-hook
+            (lambda () (prettify-symbols-mode)))
+  (setq rust-mode-treesitter-derive t)
+  )
 
 ;; For json files
 (use-package json-mode
