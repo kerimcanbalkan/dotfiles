@@ -29,10 +29,7 @@ require("lazy").setup({
 	require("plugins.none-ls"),
 	require("plugins.treesitter"),
 	require("plugins.misc"),
-	require("plugins.obsidian"),
-	require("plugins.render-markdown"),
 	require("plugins.gopher"),
-	require("plugins.markdown-preview"),
 	require("plugins.snacks"),
 	require("plugins.vague"),
 })
