@@ -361,4 +361,59 @@
   :ensure t
   :config
   (setq denote-directory (expand-file-name "~/Notes/")))
+
+(use-package exwm
+  :ensure t
+  :config
+  ;; Set the initial number of workspaces
+  (setq exwm-workspace-number 5)
+
+  ;; Rename buffer to match class name
+  (add-hook 'exwm-update-class-hook
+            (lambda ()
+              (exwm-workspace-rename-buffer exwm-class-name)))
+
+  ;; Define global keybindings
+  (setq exwm-input-global-keys
+        `(
+          ([?\s-r] . exwm-reset)
+          ([?\s-w] . exwm-workspace-switch)
+          ([?\s-&] . ,(lambda (cmd)
+                        (interactive (list (read-shell-command "$ ")))
+                        (start-process-shell-command cmd nil cmd)))
+          ,@(mapcar (lambda (i)
+                      `(,(kbd (format "s-%d" i)) .
+                        (lambda ()
+                          (interactive)
+                          (exwm-workspace-switch-create ,i))))
+                    (number-sequence 0 9))))
+
+  ;; Display management function
+  (defun exwm-change-screen-hook ()
+    (let ((xrandr-output-regexp "\n\\([^ ]+\\) connected ")
+          default-output)
+      (with-temp-buffer
+        (call-process "xrandr" nil t nil)
+        (goto-char (point-min))
+        (re-search-forward xrandr-output-regexp nil 'noerror)
+        (setq default-output (match-string 1))
+        (forward-line)
+        (if (not (re-search-forward xrandr-output-regexp nil 'noerror))
+            (call-process "xrandr" nil nil nil "--output" default-output "--auto")
+          (call-process
+           "xrandr" nil nil nil
+           "--output" (match-string 1) "--primary" "--auto"
+           "--output" default-output "--off")
+          (setq exwm-randr-workspace-monitor-plist (list 0 (match-string 1)))))))
+
+  ;; Enable screen change handling
+  (require 'exwm-randr)
+  (add-hook 'exwm-randr-screen-change-hook #'exwm-change-screen-hook)
+  (exwm-randr-mode 1)
+
+  ;; Remap Caps Lock to Ctrl (setxkbmap method)
+  (start-process-shell-command "setxkbmap" nil "setxkbmap -option ctrl:nocaps")
+
+  ;; Enable EXWM
+  (exwm-enable))
 ;;; init.el ends here
