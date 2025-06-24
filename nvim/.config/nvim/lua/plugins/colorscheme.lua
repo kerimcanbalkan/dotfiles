@@ -1,12 +1,12 @@
 return {
-	"ellisonleao/gruvbox.nvim",
+	"blazkowolf/gruber-darker.nvim",
 	lazy = false,
 	priority = 1000,
 	opts = {},
 	config = function(_, opts)
 		vim.o.termguicolors = true
 		vim.o.background = "dark"
-		require("gruvbox").setup(opts)
-		vim.cmd.colorscheme("gruvbox")
+		require("gruber-darker").setup(opts)
+		vim.cmd.colorscheme("gruber-darker")
 	end,
 }
