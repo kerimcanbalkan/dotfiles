@@ -68,8 +68,12 @@ vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Go to next diagnos
 vim.keymap.set("n", "<leader>d", vim.diagnostic.open_float, { desc = "Open floating diagnostic message" })
 vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostics list" })
 
--- Obsidian Commands
-vim.keymap.set("n", "<leader>on", ":ObsidianTemplate note<cr> :lua vim.cmd([[1,/^\\S/s/^\\n\\{1,}//]])<cr>")
+-- Copy to system clipboard
+vim.keymap.set("n", "y", '"+y')
+vim.keymap.set("n", "yy", '"+yy')
+vim.keymap.set("n", "Y", '"+Y')
+vim.keymap.set("x", "y", '"+y')
+vim.keymap.set("x", "Y", '"+Y')
 
 -- Go shortcuts
 vim.keymap.set("n", "<leader>ef", ":GoIfErr<CR>", opts) -- open new tab

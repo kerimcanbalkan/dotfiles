@@ -32,6 +32,8 @@ require("lazy").setup({
 	require("plugins.gopher"),
 	require("plugins.snacks"),
 	require("plugins.vague"),
+	require("plugins.nvim-orgmode"),
+	require("plugins.pywal"),
 })
 
 -- The line beneath this is called `modeline`. See `:help modeline`

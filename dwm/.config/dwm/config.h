@@ -1,5 +1,6 @@
 /* See LICENSE file for copyright and license details. */
 #include <X11/XF86keysym.h>
+#include "/home/balkan/.cache/wal/colors-wal-dwm.h"
 
 /* appearance */
 static const unsigned int borderpx  = 1;        /* border pixel of windows */
@@ -8,16 +9,16 @@ static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 0;        /* 0 means bottom bar */
 static const char *fonts[]          = { "monospace:size=13" };
 static const char dmenufont[]       = "monospace:size=13";
-static const char col_gray1[]       = "#1d2021";
-static const char col_gray2[]       = "#ebdbb2";
-static const char col_gray3[]       = "#fabd2f";
-static const char col_gray4[]       = "#3c3836";
-static const char col_cyan[]        = "#d79921";
-static const char *colors[][3]      = {
-	/*               fg         bg         border   */
-	[SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
-	[SchemeSel]  = { col_gray4, col_cyan,  col_cyan  },
-};
+//static const char col_gray1[]       = "#1d2021";
+//static const char col_gray2[]       = "#ebdbb2";
+//static const char col_gray3[]       = "#fabd2f";
+//static const char col_gray4[]       = "#3c3836";
+//static const char col_cyan[]        = "#d79921";
+//static const char *colors[][3]      = {
+//	/*               fg         bg         border   */
+//	[SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
+//	[SchemeSel]  = { col_gray4, col_cyan,  col_cyan  },
+//};
 static const unsigned int gappx     = 10;
 
 /* tagging */
@@ -59,7 +60,7 @@ static const Layout layouts[] = {
 
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
-static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
+static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, NULL};
 static const char *termcmd[]  = { "st", NULL };
 static const char *volumeUp[] = {"wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "5%+", NULL};
 static const char *volumeDown[] = {"wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "5%-", NULL};
