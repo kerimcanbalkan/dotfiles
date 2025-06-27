@@ -30,6 +30,9 @@ char *vtiden = "\033[?6c";
 static float cwscale = 1.0;
 static float chscale = 1.0;
 
+// opacity
+float alpha = 0.8;
+
 /*
  * word delimiter string
  *
