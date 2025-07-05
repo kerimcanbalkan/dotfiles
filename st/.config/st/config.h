@@ -6,7 +6,7 @@
  * font: see http://freedesktop.org/software/fontconfig/fontconfig-user.html
  */
 #include "/home/balkan/.cache/wal/colors-wal-st.h"
-static char *font = "Liberation Mono:pixelsize=16:antialias=true:autohint=true";
+static const char *font = "Terminess Nerd Font Mono:size=14";
 static int borderpx = 2;
 
 /*
