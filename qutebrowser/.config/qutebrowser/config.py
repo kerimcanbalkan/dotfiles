@@ -86,3 +86,6 @@ c.content.blocking.adblock.lists = [
 ]
 c.content.autoplay = False
 c.content.javascript.can_open_tabs_automatically = False
+
+c.fonts.default_family = "Terminess Nerd Font"
+c.fonts.default_size = "12pt"

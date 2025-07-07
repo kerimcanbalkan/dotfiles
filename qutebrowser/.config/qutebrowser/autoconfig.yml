@@ -12,3 +12,5 @@ settings:
     global: both
   content.javascript.clipboard:
     https://github.com: access-paste
+  fonts.default_family:
+    global: Terminess Nerd Font
