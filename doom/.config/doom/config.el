@@ -1,26 +1,25 @@
-;; User info
 (setq user-full-name "Kerimcan Balkan"
-      user-mail-address "kerimcanbalkan@gmail.com")
+      user-mail-address "kerimcanbalkan@protonmail.com")
 
 ;; Color theme
-;;(setq doom-theme 'doom-nord)
-(load-theme 'zenburn t)
+(setq doom-theme 'doom-gruvbox)
 
-;; Line numbers
-(setq display-line-numbers-type t)
-
-;; remove top frame bar in emacs
-(add-to-list 'default-frame-alist '(undecorated . t))
-
-;; Org Directory
-(setq org-directory "~/org/")
+;; Relative line numbers
+(setq display-line-numbers-type 'relative)
 
 ;; Font
-(setq doom-font (font-spec :family "RobotoMono Nerd Font" :size 16))
+(setq doom-font (font-spec :family "JetBrainsMono Nerd Font" :size 15))
 
-;; Revert buffers when the underlying file has changed
-(global-auto-revert-mode 1)
+;; Org directory
+(setq org-directory "~/Notes/")
 
+;; Projectile projects location unfortunately it does not find projects I don't know why!
+(setq projectile-project-search-path '("~/Projects/" "~/work/" "~/other-projects/"))
+
+;; Evil mode set insert cursor
+(setq evil-insert-state-cursor '(bar . 2))
+
+;; Tweaks that I copied from jblais's config
 ;; Performance optimizations
 (setq gc-cons-threshold (* 256 1024 1024))
 (setq read-process-output-max (* 4 1024 1024))
@@ -34,39 +33,23 @@
 ;; Version control optimization
 (setq vc-handled-backends '(Git))
 
-;; trash files before deleting
-(setq delete-by-moving-to-trash t)
+;; Fix x11 issues
+(setq x-no-window-manager t)
+(setq frame-inhibit-implied-resize t)
+(setq focus-follows-mouse nil)
 
-;; Short splash
+;; Setup custom splashscreen
 (remove-hook '+doom-dashboard-functions #'doom-dashboard-widget-shortmenu)
-(remove-hook '+doom-dashboard-functions #'doom-dashboard-widget-loaded)
-(setq dashboard-footer-icon "")
+(setq fancy-splash-image "~/Pictures/Wallpapers/doom-emacs-dark.svg")
+(add-hook! '+doom-dashboard-functions :append
+  (insert "\n" (+doom-dashboard--center +doom-dashboard--width "Welcome to Emacs")))
 
+;; Speed of which-key popup
+(setq which-key-idle-delay 0.2)
 
-(defun my-weebery-is-always-greater ()
-  (let* ((banner '("GNU Emacs"))
-         (longest-line (apply #'max (mapcar #'length banner))))
-    (put-text-property
-     (point)
-     (dolist (line banner (point))
-       (insert (+doom-dashboard--center
-                +doom-dashboard--width
-                (concat line (make-string (max 0 (- longest-line (length line))) 32)))
-               "\n"))
-     'face 'doom-dashboard-banner)))
-
-(setq +doom-dashboard-ascii-banner-fn #'my-weebery-is-always-greater)
-
-;; Keybindings
-(map! :after magit "C-c C-g" #'magit-status)
-(map! "M-g g" #'avy-goto-line)
-
-
-;; Performance
-(setq gc-cons-threshold 100000000
-      read-process-output-max (* 1024 1024)
-      lsp-idle-delay 0.5
-      lsp-log-io nil)
+;; Evil-escape sequence
+(setq-default evil-escape-key-sequence "jk")
+(setq-default evil-escape-delay 0.1)
 
 ;; LSP Performance optimizations and settings
 (after! lsp-mode
@@ -79,20 +62,7 @@
         lsp-enable-on-type-formatting nil
         lsp-enable-snippet nil
         lsp-enable-symbol-highlighting nil
-        lsp-enable-links nil
-
-        ;; Go-specific settings
-        lsp-go-hover-kind "Synopsis"
-        lsp-go-analyses '((fieldalignment . t)
-                          (nilness . t)
-                          (unusedwrite . t)
-                          (unusedparams . t))
-
-        ;; Register custom gopls settings
-        lsp-gopls-completeUnimported t
-        lsp-gopls-staticcheck t
-        lsp-gopls-analyses '((unusedparams . t)
-                             (unusedwrite . t))))
+        lsp-enable-links nil))
 
 ;; LSP UI settings for better performance
 (after! lsp-ui
@@ -105,68 +75,28 @@
         lsp-ui-sideline-enable nil
         lsp-ui-peek-enable t))
 
-;; Tailwind
+(use-package! svelte-mode
+  :mode "\\.svelte\\'"
+  :config
+  (setq svelte-basic-offset 2)
+  ;; Disable automatic reformatting
+  (setq svelte-format-on-save nil)
+  ;; Use prettier instead
+  (add-hook 'svelte-mode-hook 'prettier-js-mode))
+
+;; Configure prettier
+(use-package! prettier-js
+  :config
+  (setq prettier-js-args
+        '("--parser" "svelte"
+          "--tab-width" "2"
+          "--use-tabs" "true")))
+
 (use-package! lsp-tailwindcss
-  :after
-  lsp-mode
+  :after lsp-mode
   :init
   (setq lsp-tailwindcss-add-on-mode t))
 
-;; Golang stuff
 (after! lsp-mode
-  (setq  lsp-go-use-gofumpt t)
-  )
-;; automatically organize imports
-(add-hook 'go-mode-hook #'lsp-deferred)
-;; Make sure you don't have other goimports hooks enabled.
-(defun lsp-go-install-save-hooks ()
-  (add-hook 'before-save-hook #'lsp-organize-imports t t))
-(add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
-
-;; enable all analyzers; not done by default
-(after! lsp-mode
-  (setq  lsp-go-analyses '((fieldalignment . t)
-                           (nilness . t)
-                           (shadow . t)
-                           (unusedparams . t)
-                           (unusedwrite . t)
-                           (useany . t)
-                           (unusedvariable . t)))
-  )
-
-;; Nov(epub reader) configurations
-(add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
-
-(setq nov-text-width t)
-(setq visual-fill-column-center-text t)
-(add-hook 'nov-mode-hook 'visual-line-mode)
-(add-hook 'nov-mode-hook 'visual-fill-column-mode)
-
-(after! nov
-  (require 'justify-kp)
-  (setq nov-text-width t)
-
-  (defun my-nov-window-configuration-change-hook ()
-    (my-nov-post-html-render-hook)
-    (remove-hook 'window-configuration-change-hook
-                 #'my-nov-window-configuration-change-hook
-                 t))
-
-  (defun my-nov-post-html-render-hook ()
-    (if (get-buffer-window)
-        (let ((max-width (pj-line-width))
-              buffer-read-only)
-          (save-excursion
-            (goto-char (point-min))
-            (while (not (eobp))
-              (unless (looking-at "^[[:space:]]*$")
-                (goto-char (line-end-position))
-                (when (> (shr-pixel-column) max-width)
-                  (goto-char (line-beginning-position))
-                  (pj-justify)))
-              (forward-line 1))))
-      (add-hook 'window-configuration-change-hook
-                #'my-nov-window-configuration-change-hook
-                nil t)))
-
-  (add-hook 'nov-post-html-render-hook #'my-nov-post-html-render-hook))
+  ;; Typescript language server (tsserver)
+  (setq lsp-clients-typescript-server-args '("--stdio")))
