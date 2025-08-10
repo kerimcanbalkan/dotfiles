@@ -6,7 +6,7 @@
  * font: see http://freedesktop.org/software/fontconfig/fontconfig-user.html
  */
 #include "/home/balkan/.cache/wal/colors-wal-st.h"
-static const char *font = "Terminess Nerd Font:size=14";
+static const char *font = "JetBrainsMono Nerd Font:size=12";
 static int borderpx = 2;
 
 /*
