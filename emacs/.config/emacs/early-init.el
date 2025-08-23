@@ -21,3 +21,6 @@
                             (background-color . "#000000")
                             (ns-appearance . dark)
                             (ns-transparent-titlebar . t)))
+(custom-set-faces
+ '(mode-line ((t (:box nil))))
+ '(mode-line-inactive ((t (:box nil)))))
