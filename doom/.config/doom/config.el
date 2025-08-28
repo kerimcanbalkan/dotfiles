@@ -8,9 +8,9 @@
 (setq display-line-numbers-type 'relative)
 
 ;; Font
-(setq doom-font (font-spec :family "JetBrainsMono Nerd Font" :size 15))
+(setq doom-font (font-spec :family "JetBrainsMono Nerd Font" :size 13))
 
-;; Org directory
+                                        ; Org directory
 (setq org-directory "~/Notes/")
 
 ;; Projectile projects location unfortunately it does not find projects I don't know why!
@@ -100,3 +100,18 @@
 (after! lsp-mode
   ;; Typescript language server (tsserver)
   (setq lsp-clients-typescript-server-args '("--stdio")))
+
+;; Elfeed
+(make-directory "~/.elfeed" t)
+(after! elfeed
+  (setq elfeed-db-directory "~/.elfeed")
+  (setq elfeed-search-filter "@1-week-ago +unread -4chan -news -Reddit"))
+(setq rmh-elfeed-org-files '("~/.config/doom/elfeed.org"))
+
+(setq browse-url-browser-function 'browse-url-generic)
+(setq browse-url-generic-program "librewolf")
+
+(use-package! org
+  :custom
+  (org-log-done 'time)
+  (org-agenda-files '("~/Notes/agenda.org")))

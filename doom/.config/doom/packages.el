@@ -50,3 +50,4 @@
 (package! prettier-js)
 (package! go-mode)
 (package! lsp-tailwindcss :recipe (:host github :repo "merrickluo/lsp-tailwindcss"))
+(package! denote)
