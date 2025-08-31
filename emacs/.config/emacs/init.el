@@ -57,6 +57,7 @@
 
 ;; Add MELPA (Milkypostman's Emacs Lisp Package Archive) to the list of package archives.
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+(setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
 
 ;; Define a global customizable variable `ek-use-nerd-fonts' to control the use of
 ;; Nerd Fonts symbols throughout the configuration. This boolean variable allows
@@ -94,6 +95,7 @@
   (split-width-threshold 300)                     ;; Prevent automatic window splitting if the window width exceeds 300 pixels.
   (switch-to-buffer-obey-display-actions t)       ;; Make buffer switching respect display actions.
   (tab-always-indent 'complete)                   ;; Make the TAB key complete text instead of just indenting.
+  (indent-tabs-mode nil)                          ;; Spaces instead of tabs
   (tab-width 4)                                   ;; Set the tab width to 4 spaces.
   (treesit-font-lock-level 4)                     ;; Use advanced font locking for Treesit mode.
   (truncate-lines t)                              ;; Enable line truncation to avoid wrapping long lines.
@@ -293,6 +295,7 @@
   :defer t
   :hook (prog-mode . flymake-mode)
   :custom
+  (flymake-show-diagnostics-at-end-of-line t)
   (flymake-margin-indicators-string
    '((error "!»" compilation-error) (warning "»" compilation-warning)
      (note "»" compilation-info))))
@@ -470,7 +473,7 @@
   :defer t
   :custom
   (corfu-auto t)                         ;; Auto completion
-  (corfu-auto-delay 0.2)                   ;; Delay before popup (enable if corfu-auto is t)
+  (corfu-auto-delay 0.2)                 ;; Delay before popup (enable if corfu-auto is t)
   (corfu-auto-prefix 1)                  ;; Trigger completion after typing 1 character
   (corfu-quit-no-match t)                ;; Quit popup if no match
   (corfu-scroll-margin 5)                ;; Margin when scrolling completions
@@ -495,6 +498,16 @@
   :defer t
   :after (:all corfu))
 
+(use-package dtrt-indent
+  :ensure t
+  :commands (dtrt-indent-global-mode
+             dtrt-indent-mode
+             dtrt-indent-adapt
+             dtrt-indent-undo
+             dtrt-indent-diagnosis
+             dtrt-indent-highlight)
+  :config
+  (dtrt-indent-global-mode))
 
 ;;; LSP
 ;; Emacs comes with an integrated LSP client called `eglot', which offers basic LSP functionality.
@@ -516,8 +529,7 @@
   :defer t
   :hook (
          (lsp-mode . lsp-enable-which-key-integration)  ;; Integrate with Which Key
-         ((js-ts-mode                                   ;; Enable LSP for JavaScript
-           tsx-ts-mode                                  ;; Enable LSP for TSX
+         ((tsx-ts-mode                                  ;; Enable LSP for TSX
            typescript-ts-base-mode                      ;; Enable LSP for TypeScript
            css-mode                                     ;; Enable LSP for CSS
            go-ts-mode                                   ;; Enable LSP for Go
@@ -542,7 +554,6 @@
   (lsp-enable-file-watchers nil)                        ;; Disable file watchers.
   (lsp-enable-folding nil)                              ;; Disable folding.
   (lsp-enable-imenu t)                                  ;; Enable Imenu support.
-  (lsp-enable-indentation nil)                          ;; Disable indentation.
   (lsp-enable-on-type-formatting nil)                   ;; Disable on-type formatting.
   (lsp-enable-suggest-server-download t)                ;; Enable server download suggestion.
   (lsp-enable-symbol-highlighting t)                    ;; Enable symbol highlighting.
@@ -589,6 +600,34 @@
   :ensure t
   :straight t
   :defer t)
+
+(use-package go-ts-mode
+  :ensure nil
+  :hook
+  (go-ts-mode . lsp-deferred)
+  (go-ts-mode . go-format-on-save-mode)
+  :init
+  (add-to-list 'treesit-language-source-alist '(go "https://github.com/tree-sitter/tree-sitter-go"))
+  (add-to-list 'treesit-language-source-alist '(gomod "https://github.com/camdencheek/tree-sitter-go-mod"))
+  ;; (dolist (lang '(go gomod)) (treesit-install-language-grammar lang))
+  (add-to-list 'auto-mode-alist '("\\.go\\'" . go-ts-mode))
+  (add-to-list 'auto-mode-alist '("/go\\.mod\\'" . go-mod-ts-mode))
+  :config
+  (reformatter-define go-format
+    :program "goimports"
+    :args '("/dev/stdin"))
+  :general
+  ;; ...
+  )
+
+(use-package prettier-js
+  :ensure t
+  :straight t
+  :hook
+  (js-ts-mode . prettier-js-mode)
+  (tsx-ts-mode . prettier-js-mode)
+  (typescript-ts-base-mode . prettier-js-mode)
+  (web-mode . prettier-js-mode))
 
 
 ;;; DIFF-HL
@@ -1090,6 +1129,11 @@
   (org-log-done 'time)
   (org-agenda-files '("~/Notes/agenda.org")))
 
+(use-package org-modern
+  :ensure t
+  :straight t
+  :hook (org-mode . org-modern-mode))
+
 ;;; Reading inside emacs
 (use-package nov
   :ensure t
@@ -1103,6 +1147,10 @@
   :straight t
   :defer t)
 
+;; Give presentations inside emacs
+(use-package dslide
+  :ensure t
+  :straight t)
 
 ;;; UTILITARY FUNCTION TO INSTALL EMACS-KICK
 (defun ek/first-install ()

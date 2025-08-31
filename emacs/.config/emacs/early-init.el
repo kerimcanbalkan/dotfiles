@@ -1,8 +1,11 @@
 ;; Startup speed, annoyance suppression
+(setq gc-cons-percentage 0.6)
 (setq gc-cons-threshold 10000000)
 (setq byte-compile-warnings '(not obsolete))
 (setq warning-suppress-log-types '((comp) (bytecomp)))
 (setq native-comp-async-report-warnings-errors 'silent)
+(setq byte-compile-warnings '(not free-vars unresolved noruntime lexical make-local))
+(setq idle-update-delay 1.0)
 
 ;; Silence stupid startup message
 (setq inhibit-startup-echo-area-message (user-login-name))
