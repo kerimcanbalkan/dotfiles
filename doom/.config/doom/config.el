@@ -115,3 +115,7 @@
   :custom
   (org-log-done 'time)
   (org-agenda-files '("~/Notes/agenda.org")))
+
+(use-package denote
+  :custom
+  (denote-directory (expand-file-name "~/Notes/")))
