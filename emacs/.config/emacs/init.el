@@ -763,7 +763,10 @@
   (setq evil-want-keybinding nil)     ;; Disable default keybinding to set custom ones.
   (setq evil-want-C-u-scroll t)       ;; Makes C-u scroll
   (setq evil-want-C-d-scroll t)       ;; Makes C-d scroll
-  (setq evil-insert-state-cursor '(bar . 2))
+  
+  (setq evil-normal-state-cursor '((box . 2) "white"))
+  (setq evil-insert-state-cursor '((box . 2) "#cc0000"))
+  (setq evil-visual-state-cursor '((box . 2) "#ffd700"))
   :config
   (evil-set-undo-system 'undo-tree)   ;; Uses the undo-tree package as the default undo system
 
@@ -774,6 +777,7 @@
   ;; Define the leader key as Space
   (evil-set-leader 'normal (kbd "SPC"))
   (evil-set-leader 'visual (kbd "SPC"))
+
 
   ;; Keybindings for searching and finding files.
   (evil-define-key 'normal 'global (kbd "<leader> s f") 'consult-find)
@@ -841,6 +845,10 @@
   (evil-define-key 'normal 'global (kbd "<leader> P") 'consult-yank-from-kill-ring)
   (define-key evil-insert-state-map (kbd "C-y") nil)
 
+  ;; Denote Note Taking
+  (evil-define-key 'normal 'global (kbd "<leader> n n") 'denote)
+  (evil-define-key 'normal 'global (kbd "<leader> n o") 'denote-open-or-create)
+
   ;; Embark actions for contextual commands
   (evil-define-key 'normal 'global (kbd "<leader> .") 'embark-act)
 
@@ -852,6 +860,11 @@
   (evil-define-key 'normal 'global (kbd "<leader> h f") 'describe-function) ;; Describe function
   (evil-define-key 'normal 'global (kbd "<leader> h v") 'describe-variable) ;; Describe variable
   (evil-define-key 'normal 'global (kbd "<leader> h k") 'describe-key) ;; Describe key
+
+  ;; Disable C-y behavior
+  (evil-define-key 'normal 'global (kbd "C-y") nil)
+  (evil-define-key 'insert 'global (kbd "C-y") nil)
+  (evil-define-key 'visual 'global (kbd "C-y") nil)
 
   ;; Tab navigation
   (evil-define-key 'normal 'global (kbd "] t") 'tab-next) ;; Go to next tab
