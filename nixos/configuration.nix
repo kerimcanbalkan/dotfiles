@@ -101,6 +101,10 @@
     wayland = {
       enable = true;
     };
+    extraPackages = with pkgs; [
+      sddm-astronaut
+    ];
+    theme = "sddm-astronaut-theme";
   };
 
   # Autocpufreq power manager
