@@ -9,6 +9,7 @@
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+  boot.consoleLogLevel = 3;
 
   boot.initrd.luks.devices."luks-82a289ea-29a2-4cdb-a657-42ddfe53434e".device = "/dev/disk/by-uuid/82a289ea-29a2-4cdb-a657-42ddfe53434e";
   networking.hostName = "balkan";
@@ -95,17 +96,7 @@
     ];
   };
 
-  services.displayManager.sddm = {
-    enable = true;
-    enableHidpi = true;
-    wayland = {
-      enable = true;
-    };
-    extraPackages = with pkgs; [
-      sddm-astronaut
-    ];
-    theme = "sddm-astronaut-theme";
-  };
+  services.displayManager.ly.enable = true;
 
   # Autocpufreq power manager
     programs.auto-cpufreq.enable = true;
@@ -165,6 +156,8 @@
     settings =  {
       main = {
         font = "JetBrainsMono Nerd Font:size=11";
+        dpiAware = true;
+        pad = "10x10";
       };
       scrollback = {
         lines = 100000;
@@ -174,6 +167,7 @@
 
 
 
+  services.fwupd.enable = true;
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
@@ -183,10 +177,9 @@
   ];
 
   environment.systemPackages = with pkgs; [
-  vim 
-  bat
-  unzip
-  qutebrowser
+    vim 
+    bat
+    unzip
   ];
 
   system.stateVersion = "25.05";

@@ -3,9 +3,9 @@ echo '['
 first=true
 
 while true; do
+    weather=$(curl -s "wttr.in/?format=1") # e.g. 🌦️ +15°C
     date_formatted=$(date "+%A %B %d")     # e.g. Friday May 05
     time_formatted=$(date "+%H:%M")        # e.g. 13:45
-    weather=$(curl -s "wttr.in/?format=1") # e.g. 🌦️ +15°C
 
     text="$weather | $date_formatted | $time_formatted"
 

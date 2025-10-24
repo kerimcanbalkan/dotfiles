@@ -50,6 +50,14 @@ in
   };
 
   programs.tmux.enable = true;
+  
+  services.mako = {
+    enable = true;
+    settings = {
+      font = "JetBrains Mono 10";
+      background-color = "#282828";
+    };
+  };
 
   xdg.configFile = builtins.mapAttrs
     (name: subpath: {
@@ -82,6 +90,10 @@ in
     wget
     gcc
     signal-desktop
+    discord
+    qutebrowser
+    gimp
+    inkscape
   ];
 
 }
