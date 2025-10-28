@@ -28,9 +28,9 @@ return {
 
     local sources = {
       diagnostics.checkmake,
-      formatting.prettier.with { filetypes = { 'html', 'json', 'yaml', 'markdown', 'tsx', 'jsx' } },
+      formatting.prettier.with { filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact', 'html', 'json', 'yaml', 'markdown' }},
       formatting.stylua,
-	  formatting.gofmt,
+      formatting.gofmt,
       formatting.shfmt.with { args = { '-i', '4' } },
 	  null_ls.builtins.formatting.gofumpt,
 	  null_ls.builtins.formatting.goimports_reviser,

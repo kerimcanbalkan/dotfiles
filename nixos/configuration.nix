@@ -20,6 +20,9 @@
   # Disable NetworkManager's internal DNS resolution
   networking.networkmanager.dns = "none";
 
+  # Disable firewall
+  networking.firewall.enable = false;
+
   # These options are unnecessary when managing DNS ourselves
   networking.useDHCP = false;
   networking.dhcpcd.enable = false;
@@ -79,6 +82,7 @@
     enable = true;
     xwayland.enable = true;
     extraPackages = with pkgs; [
+      swaylock
       wmenu
       wl-clipboard
       wf-recorder
@@ -150,13 +154,14 @@
     };
   };
 
+  programs.chromium.enable = true;
+
   programs.foot = {
     enable = true;
     theme = "gruvbox-dark";
     settings =  {
       main = {
         font = "JetBrainsMono Nerd Font:size=11";
-        dpiAware = true;
         pad = "10x10";
       };
       scrollback = {
@@ -180,6 +185,7 @@
     vim 
     bat
     unzip
+    kitty
   ];
 
   system.stateVersion = "25.05";
