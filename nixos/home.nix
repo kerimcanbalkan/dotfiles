@@ -33,7 +33,7 @@ in
   programs.git = {
     enable = true;
     userName = "kerimcanbalkan";
-    userEmail = "kerimcanbalkan@protonmail.com";
+    userEmail = "kerimcanbalkan@gmail.com";
   };
 
   programs.gh = {
@@ -92,8 +92,6 @@ in
     signal-desktop
     discord
     qutebrowser
-    gimp
-    inkscape
   ];
 
 }

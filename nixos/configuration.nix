@@ -97,15 +97,16 @@
       w3m
       imagemagick
       lf
+      libreoffice-fresh
     ];
   };
 
   services.displayManager.ly.enable = true;
 
   # Autocpufreq power manager
-    programs.auto-cpufreq.enable = true;
-    # optionally, you can configure your auto-cpufreq settings, if you have any
-    programs.auto-cpufreq.settings = {
+  programs.auto-cpufreq.enable = true;
+  # optionally, you can configure your auto-cpufreq settings, if you have any
+  programs.auto-cpufreq.settings = {
     charger = {
       governor = "performance";
       turbo = "auto";
@@ -154,8 +155,6 @@
     };
   };
 
-  programs.chromium.enable = true;
-
   programs.foot = {
     enable = true;
     theme = "gruvbox-dark";
@@ -170,7 +169,10 @@
     };
   };
 
-
+  environment.variables = {
+    EDITOR = "vim";
+    VISUAL = "vim";
+  };
 
   services.fwupd.enable = true;
 
@@ -185,7 +187,9 @@
     vim 
     bat
     unzip
+    aerc
     kitty
+    chromium
   ];
 
   system.stateVersion = "25.05";
