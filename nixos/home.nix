@@ -11,7 +11,10 @@ let
     nvim = "nvim";
     # lxqt = "lxqt";
     sway = "sway";
+    swaylock = "swaylock";
     kanshi = "kanshi";
+    tmux = "tmux";
+    waybar = "waybar";
   };
 in
 
@@ -49,8 +52,6 @@ in
     vimAlias = true;
   };
 
-  programs.tmux.enable = true;
-  
   services.mako = {
     enable = true;
     settings = {
@@ -67,7 +68,7 @@ in
     configs;
 
   home.packages = with pkgs; [
-    luarocks
+    tmux
     fd
     fzf
     lua

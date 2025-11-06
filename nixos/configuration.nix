@@ -35,6 +35,10 @@
     "8.8.4.4"
   ];
 
+  # Enable bluetooth
+  hardware.bluetooth.enable = true;
+  services.blueman.enable = true;
+
   # Enable network manager applet
   programs.nm-applet.enable = true;
 
@@ -82,8 +86,10 @@
     enable = true;
     xwayland.enable = true;
     extraPackages = with pkgs; [
-      swaylock
+      swaylock-effects
+      swayidle
       wmenu
+      waybar
       wl-clipboard
       wf-recorder
       kanshi
@@ -166,6 +172,9 @@
       scrollback = {
         lines = 100000;
       };
+      colors = {
+        alpha = 0.9;
+      };
     };
   };
 
@@ -182,6 +191,9 @@
   fonts.packages = with pkgs; [
     nerd-fonts.jetbrains-mono
   ];
+
+  # Enable automatic mounting of USB drives
+  services.udisks2.enable = true;
 
   environment.systemPackages = with pkgs; [
     vim 

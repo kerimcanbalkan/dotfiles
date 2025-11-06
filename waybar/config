@@ -1,0 +1,93 @@
+{
+    "layer": "bottom",
+        "position": "bottom",
+        "height": 18,
+        "spacing": 5,
+        "modules-left": ["sway/workspaces"],
+        "modules-center": ["sway/window"],
+        "modules-right": ["sway/language","temperature","battery","pulseaudio","clock"],
+        "sway/window": {
+            "format": "{}"
+        },
+        "sway/workspaces" : {
+            "disable-scroll": true,
+            "all-outputs": true,
+            "format": "{icon}",
+            "format-icons": {
+                "1": "",
+                "2": "",
+                "3": "",
+                "4": "",
+                "5": "",
+                "6": "",
+            },       
+            "persistent-workspaces": {
+                "1": "",
+                "2": "",
+                "3": "",
+                "4": "",
+                "5": "",
+                "6": "",
+            } 
+        },
+        "temperature": {
+            "critical-threshold": 90,
+            "interval": 5,
+            "format": "{icon} {temperatureC}°",
+            "format-icons": [
+                "",
+            "",
+            "",
+            "",
+            ""
+            ],
+            "tooltip": false
+        },
+        "sway/language": {
+            "format": " {}",
+            "min-length": 5,
+            "on-click": "swaymsg 'input * xkb_switch_layout next'",
+            "tooltip": false
+        },
+        "battery": {
+            "bat": "BAT0",
+            "interval": 10,
+            "states": {
+                "warning": 30,
+                "critical": 15
+            },
+            "format-time": "{H}:{M:02}",
+            "format": "{icon} {capacity}% ({time})",
+            "format-charging": " {capacity}% ({time})",
+            "format-full": "{icon} {capacity}%",
+            "format-alt": "{icon} {power}W",
+            "format-plugged": " {capacity}%",
+            "format-icons": [
+                "",
+            "",
+            "",
+            "",
+            ""
+            ],
+            "tooltip": false
+        },
+        "clock": {
+            "format": "{:%d/%m/%Y %H:%M}",
+            "tooltip-format": "<tt><small>{calendar}</small></tt>",
+            "calendar": {
+                "format": {
+                    "months": "<span color='#ebdbb2'><b>{}</b></span>",
+                    "today": "<span color='#98971a'><b>{}</b></span>"
+                }
+            }
+        },
+        "pulseaudio": {
+            "format": "{icon} {volume}%",
+            "format-icons": {
+                "default": ["\uf026", "\uf027", "\uf028"]
+            },
+            "on-click": "pactl set-sink-mute @DEFAULT_SINK@ toggle",
+            "on-click-right": "pavucontrol",
+            "format-muted": "\uf00d {volume}%"
+        },
+}

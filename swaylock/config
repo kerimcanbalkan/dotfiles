@@ -1,0 +1,10 @@
+ignore-empty-password
+font="JetBrainsMono Nerd Font"
+
+clock
+indicator
+timestr=%R
+datestr=%a, %e of %B
+
+image=/home/kerim/Pictures/Wallpapers/itachi.png
+

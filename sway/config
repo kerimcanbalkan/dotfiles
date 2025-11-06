@@ -21,10 +21,16 @@ set $menu wmenu-run
 ### Output configuration
 #
 # Default wallpaper (more resolutions are available in /run/current-system/sw/share/backgrounds/sway/)
-output eDP-1 scale 1.5
+output eDP-1 scale 2
 output * bg ~/Pictures/Wallpapers/itachi.png fill
 output * allow_tearing yes
 output * max_render_time off
+
+# Configure apps to workspaces
+assign [app_id="qutebrowser"] workspace 2
+assign [app_id="firefox"] workspace 5
+assign [app_id="signal_desktop"] workspace 6
+assign [app_id="foot"] workspace 6
 
 # Appearence
 default_border pixel 1
@@ -59,11 +65,13 @@ exec swayidle -w \
       natural_scroll enabled
       middle_emulation enabled
   }
+
   input type:keyboard {
-      xkb_layout "us"
-      xkb_options "ctrl:nocaps"
-      repeat_delay 300
-      repeat_rate 30
+      xkb_layout "us,tr"
+      xkb_variant ""
+      xkb_options "ctrl:nocaps,grp:lwin_space_toggle"
+      repeat_delay 200
+      repeat_rate 35
   }
 
 # You can also configure each device individually.
@@ -225,22 +233,24 @@ bindsym $mod+r mode "resize"
 # Status Bar:
 #
 # Read `man 5 sway-bar` for more information about this section.
-bar {
-    position bottom
-
-    # When the status_command prints a new line to stdout, swaybar updates.
-    # The default just shows the current date and time.
-    status_command ~/dotfiles/sway/status.sh
-
-    colors {
-        statusline #ebdbb2
-        background #3c3836
-
-        focused_workspace #458588 #83a598 #ebdbb2
-        inactive_workspace #282828 #282828 #928374
-    } 
-}
+# bar {
+#     position bottom
+#
+#     # When the status_command prints a new line to stdout, swaybar updates.
+#     # The default just shows the current date and time.
+#     status_command ~/dotfiles/sway/status.sh
+#
+#     colors {
+#         statusline #ebdbb2
+#         background #3c3836
+#
+#         focused_workspace #458588 #83a598 #ebdbb2
+#         inactive_workspace #282828 #282828 #928374
+#     } 
+# }
 
 exec_always foot --server
 exec_always kanshi
+exec_always --no-startup-id waybar
+
 include /etc/sway/config.d/*

@@ -14,6 +14,9 @@ vim.keymap.set("n", "<leader>w", "<cmd> w <CR>", opts)
 -- save file without auto-formatting
 vim.keymap.set("n", "<leader>sn", "<cmd>noautocmd w <CR>", opts)
 
+-- open file exploerr
+vim.keymap.set("n", "<leader>e", "<CMD>Oil<CR>", { desc = "Open parent directory" })
+
 -- fast escape
 vim.keymap.set("i", "jj", "<Esc>")
 vim.keymap.set("i", "jk", "<Esc>")
