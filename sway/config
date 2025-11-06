@@ -26,12 +26,6 @@ output * bg ~/Pictures/Wallpapers/itachi.png fill
 output * allow_tearing yes
 output * max_render_time off
 
-# Configure apps to workspaces
-assign [app_id="qutebrowser"] workspace 2
-assign [app_id="firefox"] workspace 5
-assign [app_id="signal_desktop"] workspace 6
-assign [app_id="foot"] workspace 6
-
 # Appearence
 default_border pixel 1
 gaps inner 5
