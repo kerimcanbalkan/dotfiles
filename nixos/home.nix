@@ -71,6 +71,7 @@ in
     tmux
     fd
     fzf
+    ripgrep
     lua
     stylua
     lua-language-server
@@ -88,6 +89,7 @@ in
     ripgrep
     nil
     nodejs_24
+    eas-cli
     wget
     gcc
     signal-desktop
