@@ -84,7 +84,7 @@ exec swayidle -w \
     # Start your launcher
     bindsym $mod+p exec $menu
 
-    bindsym $mod+e exec foot -e lf
+    bindsym $mod+e exec emacsclient -c
 
     # Drag floating windows by holding down $mod and left mouse button.
     # Resize them with right mouse button + $mod.
@@ -159,7 +159,7 @@ exec swayidle -w \
     bindsym $mod+v splitv
 
     # Switch the current container between different layout styles
-    bindsym $mod+w layout tabbed
+    #bindsym $mod+w layout tabbed
     bindsym $mod+n layout toggle split
 
     # Make the current focus fullscreen
@@ -243,8 +243,9 @@ bindsym $mod+r mode "resize"
 #     } 
 # }
 
-exec_always foot --server
 exec_always kanshi
+exec_always autotiling
 exec_always --no-startup-id waybar
+exec_always foot --server
 
 include /etc/sway/config.d/*

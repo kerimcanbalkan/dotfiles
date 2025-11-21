@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, callPackage, ... }:
 
 {
   imports =
@@ -88,6 +88,7 @@
     extraPackages = with pkgs; [
       swaylock-effects
       swayidle
+      autotiling
       wmenu
       waybar
       wl-clipboard
@@ -178,27 +179,32 @@
     };
   };
 
-  environment.variables = {
-    EDITOR = "vim";
-    VISUAL = "vim";
-  };
-
-  services.fwupd.enable = true;
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
+  services.fwupd.enable = true;
+
   fonts.packages = with pkgs; [
     nerd-fonts.jetbrains-mono
+    freefont_ttf
   ];
 
   # Enable automatic mounting of USB drives
   services.udisks2.enable = true;
 
+  services.pcscd.enable = true;
+  programs.gnupg.agent = {
+     enable = true;
+     pinentryPackage = pkgs.pinentry-emacs;
+     enableSSHSupport = true;
+   };
+
   environment.systemPackages = with pkgs; [
     vim 
     bat
     unzip
+    pinentry-emacs
     aerc
     kitty
     chromium

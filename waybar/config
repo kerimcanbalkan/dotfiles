@@ -36,7 +36,7 @@
             "tooltip": false
         },
         "sway/language": {
-            "format": " {}",
+            "format": "  {}",
             "min-length": 5,
             "on-click": "swaymsg 'input * xkb_switch_layout next'",
             "tooltip": false
@@ -74,7 +74,7 @@
             }
         },
         "pulseaudio": {
-            "format": "{icon} {volume}%",
+            "format": "{icon}  {volume}%",
             "format-icons": {
                 "default": ["\uf026", "\uf027", "\uf028"]
             },

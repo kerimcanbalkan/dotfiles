@@ -1,1 +1,22 @@
+# Swap files
+*.swp
+*.swo
+
+# Nix flake swap files (if your repo uses flakes)
+.flake.nix.swp
 .flakes.nix.swp
+
+# Emacs cache & generated dirs inside dotfiles/emacs/
+emacs/.cache/
+emacs/auto-save-list/
+emacs/eln-cache/
+emacs/elpa/
+emacs/eshell/
+emacs/history
+emacs/network-security.data
+emacs/places
+emacs/projects/
+emacs/recentf
+emacs/straight/
+emacs/transient/
+emacs/tree-sitter/

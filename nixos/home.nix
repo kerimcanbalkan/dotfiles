@@ -15,10 +15,11 @@ let
     kanshi = "kanshi";
     tmux = "tmux";
     waybar = "waybar";
+    emacs = "emacs";
   };
 in
 
-{
+  {
   home.username = "kerim";
   home.homeDirectory = "/home/kerim";
   home.stateVersion = "25.05";
@@ -29,8 +30,8 @@ in
       nrs = "sudo nixos-rebuild switch --flake ~/dotfiles/nixos/#balkan";
     };
     initExtra = ''
-      	  export PS1="\[\e[38;5;75m\]\u@\h \[\e[38;5;113m\]\w \[\e[38;5;189m\]\$ \[\e[0m\]"
-      	'';
+          export PS1="\[\e[38;5;75m\]\u@\h \[\e[38;5;113m\]\w \[\e[38;5;189m\]\$ \[\e[0m\]"
+    '';
   };
 
   programs.git = {
@@ -46,16 +47,21 @@ in
     };
   };
 
-   programs.neovim = {
+  programs.neovim = {
     enable = true;
     viAlias = true;
     vimAlias = true;
   };
 
+  programs.emacs = {
+    enable = true;
+    package = pkgs.emacs;
+  };
+
   services.mako = {
     enable = true;
     settings = {
-      font = "JetBrains Mono 10";
+      font = "FreeSans-12 10";
       background-color = "#282828";
     };
   };
@@ -89,6 +95,7 @@ in
     ripgrep
     nil
     nodejs_24
+    nodePackages.prettier
     eas-cli
     wget
     gcc
