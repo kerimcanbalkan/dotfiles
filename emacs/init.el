@@ -90,13 +90,10 @@
   (use-dialog-box nil)                            ;; Disable dialog boxes in favor of minibuffer prompts.
   (use-short-answers t)                           ;; Use short answers in prompts for quicker responses (y instead of yes)
   (warning-minimum-level :emergency)              ;; Set the minimum level of warnings to display.
-
   :hook                                           ;; Add hooks to enable specific features in certain modes.
   (prog-mode . display-line-numbers-mode)         ;; Enable line numbers in programming modes.
 
   :config
-  ;; Enable gpg
-  (epa-file-enable)
   ;; By default emacs gives you access to a lot of *special* buffers, while navigating with [b and ]b,
   ;; this might be confusing for newcomers. This settings make sure ]b and [b will always load a
   ;; file buffer. To see all buffers use <leader> SPC, <leader> b l, or <leader> b i.
@@ -1108,16 +1105,12 @@
   (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup)) ;; Setup icons in the marginalia mode for enhanced completion display.
 
 
-;;; CATPPUCCIN THEME
-;; The `catppuccin-theme' package provides a visually pleasing color theme
-;; for Emacs that is inspired by the popular Catppuccin color palette.
-;; This theme aims to create a comfortable and aesthetic coding environment
-;; with soft colors that are easy on the eyes.
-(use-package badger-theme
+;;; THEME
+(use-package kanagawa-themes
   :ensure t
   :straight t
   :config
-  (load-theme 'badger :no-confirm))
+  (load-theme 'kanagawa-dragon :no-confirm))
 
 ;;; Terminal emulator that I found said to be fast
 (use-package eat

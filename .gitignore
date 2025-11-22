@@ -20,3 +20,4 @@ emacs/recentf
 emacs/straight/
 emacs/transient/
 emacs/tree-sitter/
+emacs/tramp

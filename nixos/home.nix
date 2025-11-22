@@ -19,7 +19,7 @@ let
   };
 in
 
-  {
+{
   home.username = "kerim";
   home.homeDirectory = "/home/kerim";
   home.stateVersion = "25.05";
@@ -61,7 +61,7 @@ in
   services.mako = {
     enable = true;
     settings = {
-      font = "FreeSans-12 10";
+      font = "JetBrainsMono Nerd Font 10";
       background-color = "#282828";
     };
   };

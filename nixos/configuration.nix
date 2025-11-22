@@ -196,7 +196,7 @@
   services.pcscd.enable = true;
   programs.gnupg.agent = {
      enable = true;
-     pinentryPackage = pkgs.pinentry-emacs;
+     pinentryPackage = pkgs.pinentry-qt;
      enableSSHSupport = true;
    };
 
@@ -204,7 +204,7 @@
     vim 
     bat
     unzip
-    pinentry-emacs
+    pinentry-qt
     aerc
     kitty
     chromium
