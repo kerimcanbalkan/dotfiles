@@ -946,7 +946,8 @@
   (evil-mode 1))
 
 (use-package undo-fu
-  :ensure t)
+  :ensure t
+  :straight t)
 
 
 ;; EVIL COLLECTION
@@ -1122,7 +1123,7 @@
 (use-package denote
   :ensure t
   :config
-  (setq denote-directory (expand-file-name "~/Documents/notes/")))
+  (setq denote-directory (expand-file-name "~/Documents/Notes/")))
 
 ;;; Fix the emacsclient shell issue
 (use-package exec-path-from-shell
@@ -1157,6 +1158,15 @@
       smtpmail-default-smtp-server "smtp.gmail.com"
       smtpmail-smtp-server "smtp.gmail.com"
       smtpmail-smtp-service 587)
+
+(use-package pdf-tools
+  :ensure t
+  :straight t)
+
+(use-package nov
+  :ensure t
+  :straight t)
+
 
 ;;; UTILITARY FUNCTION TO INSTALL Configuration
 (defun ek/first-install ()
