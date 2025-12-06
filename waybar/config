@@ -56,11 +56,11 @@
                 "critical": 15
             },
             "format-time": "{H}:{M:02}",
-            "format": "{icon} {capacity}% ({time})",
-            "format-charging": " {capacity}% ({time})",
-            "format-full": "{icon} {capacity}%",
-            "format-alt": "{icon} {power}W",
-            "format-plugged": " {capacity}%",
+            "format": "{icon}  {capacity}% ({time})",
+            "format-charging": "  {capacity}% ({time})",
+            "format-full": "{icon}  {capacity}%",
+            "format-alt": "{icon}  {power}W",
+            "format-plugged": "  {capacity}%",
             "format-icons": [
                 "",
             "",
@@ -81,7 +81,7 @@
             }
         },
         "pulseaudio": {
-            "format": "{icon}  {volume}%",
+            "format": "{icon}   {volume}%",
             "format-icons": {
                 "default": ["\uf026", "\uf027", "\uf028"]
             },

@@ -92,7 +92,7 @@ in
     golines
     tree-sitter
     nixpkgs-fmt
-    ripgrep
+    nixd
     nil
     nodejs_24
     nodePackages.prettier

@@ -144,7 +144,6 @@
     description = "Kerimcan Balkan";
     extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [
-    #  thunderbird
     ];
   };
 
@@ -162,12 +161,14 @@
     };
   };
 
+
+
   programs.foot = {
     enable = true;
     theme = "gruvbox-dark";
     settings =  {
       main = {
-        font = "JetBrainsMono Nerd Font:size=11";
+        font = "Aporetic Sans Mono:size=11";
         pad = "10x10";
       };
       scrollback = {
@@ -179,6 +180,10 @@
     };
   };
 
+  services.emacs = {
+    enable = true;
+    package = pkgs.emacs;
+  };
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
@@ -187,7 +192,9 @@
 
   fonts.packages = with pkgs; [
     nerd-fonts.jetbrains-mono
+    nerd-fonts.geist-mono
     freefont_ttf
+    aporetic
   ];
 
   # Enable automatic mounting of USB drives
@@ -208,6 +215,8 @@
     aerc
     kitty
     chromium
+    gimp
+    inkscape
   ];
 
   system.stateVersion = "25.05";

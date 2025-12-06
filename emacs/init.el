@@ -106,10 +106,10 @@
   ;; Configure font settings based on the operating system.
   ;; Ok, this kickstart is meant to be used on the terminal, not on GUI.
   ;; But without this, I fear you could start Graphical Emacs and be sad :(
-  (set-face-attribute 'default nil :family "JetBrainsMono Nerd Font"  :height 100)
+  (set-face-attribute 'default nil :family "Aporetic Sans Mono"  :height 110)
   (when (eq system-type 'darwin)       ;; Check if the system is macOS.
     (setq mac-command-modifier 'meta)  ;; Set the Command key to act as the Meta key.
-    (set-face-attribute 'default nil :family "JetBrainsMono Nerd Font" :height 130))
+    (set-face-attribute 'default nil :family "Aporetic Sans Mono" :height 130))
 
   ;; Save manual customizations to a separate file instead of cluttering `init.el'.
   ;; You can M-x customize, M-x customize-group, or M-x customize-themes, etc.
@@ -363,8 +363,28 @@
 ;; productivity. The configuration below simply defers loading Org-mode until
 ;; it's explicitly needed, which can help speed up Emacs startup time.
 (use-package org
-  :ensure nil     ;; This is built-in, no need to fetch it.
-  :defer t)       ;; Defer loading Org-mode until it's needed.
+  :ensure nil
+  :defer t
+  :custom
+  (org-directory "/Documents/Org")
+  (org-agenda-files
+   '("~/Documents/Org/tasks.org"
+     "~/Documents/Org/projects.org"
+     "~/Documents/Org/notes.org"))
+  (org-default-notes-file "~/Documents/Org/notes.org")
+  (org-capture-templates
+   '(("t" "New Task" entry
+      (file+headline "~/Documents/Org/tasks.org" "Inbox")
+      "* TODO %?\n  Created: %U\n")
+
+     ("n" "Note" entry
+      (file+headline "~/Documents/Org/notes.org" "Notes")
+      "* %?\n  Created: %U\n")
+
+     ("p" "Project Idea" entry
+      (file+headline "~/Documents/Org/projects.org" "Ideas")
+      "* %?\n  Created: %U\n")
+     )))
 
 
 ;;; WHICH-KEY
@@ -794,6 +814,7 @@
   :hook
   (after-init . evil-mode)
   :init
+  (setq evil-disable-insert-state-bindings t)
   (setq evil-want-integration t)      ;; Integrate `evil' with other Emacs features (optional as it's true by default).
   (setq evil-want-keybinding nil)     ;; Disable default keybinding to set custom ones.
   (setq evil-want-C-u-scroll t)       ;; Makes C-u scroll
@@ -814,6 +835,10 @@
   (evil-define-key 'normal 'global (kbd "C-y") nil)
   (evil-define-key 'insert 'global (kbd "C-y") nil)
   (evil-define-key 'visual 'global (kbd "C-y") nil)
+
+  ;; Org keybinds
+  (evil-define-key 'normal 'global (kbd "<leader> o a") 'org-agenda)
+  (evil-define-key 'normal 'global (kbd "<leader> o c") 'org-capture)
 
   ;; Edit keybinds
   (evil-define-key 'normal 'global (kbd "<leader> w") 'save-buffer) ;; Save buffer
@@ -1066,6 +1091,10 @@
   :hook
   (after-init . doom-modeline-mode))
 
+(use-package rainbow-mode
+  :ensure t
+  :straight t)
+
 
 ;;; NERD ICONS
 ;; The `nerd-icons' package provides a set of icons for use in Emacs. These icons can
@@ -1161,11 +1190,29 @@
 
 (use-package pdf-tools
   :ensure t
-  :straight t)
+  :magic ("%PDF" . pdf-view-mode)
+  :straight t
+  :hook
+  (pdf-view-mode . midnight-mode)
+  (pdf-view-mode . (lambda ()
+                     (setq-local mode-line-format nil)))
+  :custom
+  (pdf-view-use-unicode-ligther nil)
+  (pdf-view-page-broken-lines nil)
+  (pdf-view-disp-ctrl-overlay nil)
+
+  (pdf-view-midnight-colors '("#c5c9c5" . "#181616"))
+  :config
+  (pdf-tools-install))
+
 
 (use-package nov
   :ensure t
   :straight t)
+
+(use-package envrc
+  :config
+  (envrc-global-mode))
 
 
 ;;; UTILITARY FUNCTION TO INSTALL Configuration
