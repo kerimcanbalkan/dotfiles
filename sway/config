@@ -1,4 +1,6 @@
 # Default config for sway
+
+
 #
 # Copy this to ~/.config/sway/config and edit it to your liking.
 #
@@ -22,7 +24,7 @@ set $menu wmenu-run
 #
 # Default wallpaper (more resolutions are available in /run/current-system/sw/share/backgrounds/sway/)
 output eDP-1 scale 2
-output * bg ~/Pictures/Wallpapers/itachi.png fill
+output * bg ~/Pictures/Wallpapers/pixel-landscape.jpg fill
 output * allow_tearing yes
 output * max_render_time off
 
@@ -63,7 +65,7 @@ exec swayidle -w \
   input type:keyboard {
       xkb_layout "us,tr"
       xkb_variant ""
-      xkb_options "ctrl:nocaps,grp:lwin_space_toggle"
+      xkb_options "ctrl:nocaps,grp:rwin_space_toggle"
       repeat_delay 200
       repeat_rate 35
   }

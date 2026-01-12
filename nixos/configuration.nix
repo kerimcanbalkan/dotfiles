@@ -36,7 +36,15 @@
   ];
 
   # Enable bluetooth
-  hardware.bluetooth.enable = true;
+  hardware.bluetooth = {
+    enable = true;
+    settings = {
+      General = {
+        ControllerMode = "bredr";
+      };
+    };
+  };
+
   services.blueman.enable = true;
 
   # Enable network manager applet
@@ -63,6 +71,13 @@
     LC_TIME = "tr_TR.UTF-8";
   };
 
+  hardware.graphics = {
+    enable = true;
+    enable32Bit = true;
+  };
+
+  services.xserver.videoDrivers = ["intel"];
+
   # Enable the X11 windowing system.
   # services.xserver = {
   #     enable = true;
@@ -82,31 +97,33 @@
   #     xkb.options = "ctrl:nocaps";
   # };
   
-  programs.sway = {
-    enable = true;
-    xwayland.enable = true;
-    extraPackages = with pkgs; [
-      swaylock-effects
-      swayidle
-      autotiling
-      wmenu
-      waybar
-      wl-clipboard
-      wf-recorder
-      kanshi
-      brightnessctl
-      imv
-      mpv
-      zathura
-      mako
-      grim
-      slurp
-      w3m
-      imagemagick
-      lf
-      libreoffice-fresh
-    ];
-  };
+  
+  programs.sway = {              #
+    enable = true;               #
+    xwayland.enable = true;      #
+    extraPackages = with pkgs; [ #
+      swaylock-effects           #
+      swayidle                   #
+      autotiling                 #
+      wmenu                      #
+      waybar                     #
+      wl-clipboard               #
+      wf-recorder                #
+      kanshi                     #
+      brightnessctl              #
+      imv                        #
+      mpv                        #
+      zathura                    #
+      mako                       #
+      grim                       #
+      slurp                      #
+      w3m                        #
+      imagemagick                #
+      lf                         #
+      libreoffice-fresh          #
+    ];                           #
+  };                             #
+  
 
   services.displayManager.ly.enable = true;
 
@@ -124,6 +141,13 @@
       turbo = "auto";
     };
   };
+
+  programs.steam = {
+    enable = true;
+    gamescopeSession.enable = true;
+  };
+
+  programs.gamemode.enable = true;
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
@@ -146,22 +170,6 @@
     packages = with pkgs; [
     ];
   };
-
-  # Install firefox.
-  programs.firefox = {
-    enable = true;
-
-    # System-level policies (works in home-manager too)
-    policies = {
-      DisableTelemetry = true;
-      DisableFirefoxStudies = true;
-      DisablePocket = true;
-      BlockAboutConfig = false;
-      OfferToSaveLogins = false;
-    };
-  };
-
-
 
   programs.foot = {
     enable = true;
@@ -191,8 +199,11 @@
   services.fwupd.enable = true;
 
   fonts.packages = with pkgs; [
+    nerd-fonts.departure-mono
+    nerd-fonts.gohufont
     nerd-fonts.jetbrains-mono
     nerd-fonts.geist-mono
+    nerd-fonts.hack
     freefont_ttf
     aporetic
   ];
@@ -212,11 +223,12 @@
     bat
     unzip
     pinentry-qt
-    aerc
     kitty
-    chromium
     gimp
     inkscape
+    librewolf
+    ungoogled-chromium
+    libvterm
   ];
 
   system.stateVersion = "25.05";

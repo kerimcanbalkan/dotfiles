@@ -36,8 +36,10 @@ in
 
   programs.git = {
     enable = true;
-    userName = "kerimcanbalkan";
-    userEmail = "kerimcanbalkan@gmail.com";
+    settings.user = {
+      email =  "kerimcanbalkan@gmail.com";
+      name = "kerimcanbalkan";
+    };
   };
 
   programs.gh = {
@@ -56,6 +58,9 @@ in
   programs.emacs = {
     enable = true;
     package = pkgs.emacs;
+    extraPackages = epkgs: with epkgs; [
+      vterm
+    ];
   };
 
   services.mako = {
@@ -102,6 +107,14 @@ in
     signal-desktop
     discord
     qutebrowser
+    librewolf
+    firefox
+    cmake
+    libvterm
+    harper
+    mangohud
+    protonup-ng
+    legendary-gl
   ];
 
 }

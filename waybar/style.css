@@ -1,11 +1,11 @@
 * {
-    font-family: "Aporetic Serif";
-    font-size: 13px;
+    font-family: "GohuFont 11 Nerd Font";
+    font-size: 14px;
 }
 
 #waybar {
-    background-color: #3c3836;
-    color: #ebdbb2;
+    background-color: #16161D;
+    color: #DCD7BA;
 }
 
 button {
@@ -15,8 +15,8 @@ button {
 }
 
 #workspaces button {
-    background-color: #1d2021;
-    color: #928374;
+    background-color: #16161D;
+    color: #C8C093;
 }
 
 #workspaces button:hover {
@@ -24,16 +24,16 @@ button {
 }
 
 #workspaces button.focused {
-    background-color: #83a598;
-    color: #ebdbb2;
+    background-color: #2D4F67;
+    color: #DCD7BA;
 }
 
 #workspaces button.urgent {
-    background-color: #cc241d;
+    background-color: #49443C;
 }
 
 #workspaces button.active {
-    background-color: #458588;
+    background-color: #658594;
 }
 
 #clock,
@@ -56,7 +56,7 @@ button {
 
 
 .modules-right>widget:last-child>#workspaces {
-    margin-right: 0;
+    margin-right: 5;
 }
 
 @keyframes blink {
@@ -66,7 +66,7 @@ button {
 }
 
 #battery.critical:not(.charging) {
-    color: #cc241d;
+    color: #E82424;
     animation-name: blink;
     animation-duration: 0.5s;
     animation-timing-function: linear;
@@ -75,10 +75,10 @@ button {
 }
 
 #battery.warning:not(.charging) {
-    color: #fabd2f;
+    color: #FF9E3B;
 }
 
 
 label:focus {
-    background-color: #000000;
+    background-color: #16161D;
 }

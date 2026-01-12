@@ -106,10 +106,10 @@
   ;; Configure font settings based on the operating system.
   ;; Ok, this kickstart is meant to be used on the terminal, not on GUI.
   ;; But without this, I fear you could start Graphical Emacs and be sad :(
-  (set-face-attribute 'default nil :family "Aporetic Sans Mono"  :height 110)
+  (set-face-attribute 'default nil :family "Aporetic Sans Mono"  :height 100)
   (when (eq system-type 'darwin)       ;; Check if the system is macOS.
     (setq mac-command-modifier 'meta)  ;; Set the Command key to act as the Meta key.
-    (set-face-attribute 'default nil :family "Aporetic Sans Mono" :height 130))
+    (set-face-attribute 'default nil :family "Aporetic Sans Mono" :height 110))
 
   ;; Save manual customizations to a separate file instead of cluttering `init.el'.
   ;; You can M-x customize, M-x customize-group, or M-x customize-themes, etc.
@@ -667,6 +667,16 @@
   :init
   (setq lsp-tailwindcss-add-on-mode t))
 
+;;; Setup harper with eglot to check grammer
+(use-package eglot
+  :hook ((text-mode . eglot-ensure)
+         (org-mode  . eglot-ensure))
+  :config
+  (add-to-list 'eglot-server-programs
+               '(text-mode . ("harper-ls" "--stdio")))
+  (add-to-list 'eglot-server-programs
+               '(org-mode  . ("harper-ls" "--stdio"))))
+
 ;;; Smart indentation
 (use-package dtrt-indent
   :ensure t
@@ -847,7 +857,7 @@
   (evil-define-key 'normal 'global (kbd "; w") 'consult-grep)
 
   ;; Terminal
-  (evil-define-key 'normal 'global (kbd "<leader> t") 'eat)
+  (evil-define-key 'normal 'global (kbd "<leader> t") 'vterm)
 
   ;; Keybindings for searching and finding files.
   (evil-define-key 'normal 'global (kbd "<leader> f f") 'consult-find)
@@ -1141,12 +1151,6 @@
   :straight t
   :config
   (load-theme 'kanagawa-dragon :no-confirm))
-
-;;; Terminal emulator that I found said to be fast
-(use-package eat
-  :straight t
-  :ensure t
-  :hook ('eshell-load-hook #'eat-eshell-mode))
 
 ;;; Note taking
 (use-package denote
