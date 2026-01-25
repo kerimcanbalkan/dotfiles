@@ -48,5 +48,6 @@
     wmenu
     wtype
     xclip
+    kitty
   ];
 }

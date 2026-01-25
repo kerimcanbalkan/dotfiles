@@ -2,14 +2,16 @@
 
 {
   imports = [
-    inputs.stylix.homeModules.stylix
     ./dotfiles.nix
+    ./bash.nix
     ./emacs.nix
     ./gpg.nix
+    ./nvim.nix
+    ./git.nix
   ];
 
-  home.username = "balkan";
-  home.homeDirectory = "/home/balkan";
+  home.username = "kerim";
+  home.homeDirectory = "/home/kerim";
   home.stateVersion = "25.05";
 
   # Let home-manager manage itself

@@ -3,7 +3,7 @@
 {
   services.power-profiles-daemon.enable = false;
   services.thermald.enable = true;
-  fwupd.enable = true;
+  services.fwupd.enable = true;
 
   # Autocpufreq power manager
   programs.auto-cpufreq.enable = true;

@@ -7,7 +7,7 @@
     settings =  {
       main = {
         font = "GeistMono Nerd Font";
-        pad = "10x10";
+        pad = "13x13";
       };
       scrollback = {
         lines = 100000;

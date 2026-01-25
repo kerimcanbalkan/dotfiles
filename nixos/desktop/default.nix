@@ -9,7 +9,6 @@
     ./browsers.nix
     ./communication.nix
     ./display-manager.nix
-    ./email.nix
     ./fonts.nix
     ./foot.nix
     ./gaming.nix

@@ -12,7 +12,6 @@
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-  boot.consoleLogLevel = 3;
 
   boot.initrd.luks.devices."luks-82a289ea-29a2-4cdb-a657-42ddfe53434e".device = "/dev/disk/by-uuid/82a289ea-29a2-4cdb-a657-42ddfe53434e";
   networking.hostName = "balkan";
