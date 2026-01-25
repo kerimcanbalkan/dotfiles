@@ -3,13 +3,13 @@
         "position": "bottom",
         "height": 18,
         "spacing": 5,
-        "modules-left": ["sway/workspaces"],
-        "modules-center": ["sway/window"],
-        "modules-right": ["sway/language","temperature","battery","pulseaudio","clock"],
-        "sway/window": {
+        "modules-left": ["hyprland/workspaces"],
+        "modules-center": ["hyprland/window"],
+        "modules-right": ["hyprland/language","temperature","battery","pulseaudio","clock"],
+        "hyprland/window": {
             "format": "{}"
         },
-        "sway/workspaces" : {
+        "hyprland/workspaces" : {
             "disable-scroll": true,
             "all-outputs": true,
             "format": "{icon}",
@@ -42,10 +42,10 @@
             ],
             "tooltip": false
         },
-        "sway/language": {
+        "hyprland/language": {
             "format": "  {}",
             "min-length": 5,
-            "on-click": "swaymsg 'input * xkb_switch_layout next'",
+            "on-click": "hyprctl switchxkblayout all next",
             "tooltip": false
         },
         "battery": {

@@ -6,8 +6,8 @@
     theme = "gruvbox-dark";
     settings =  {
       main = {
-        font = "GeistMono Nerd Font";
-        pad = "13x13";
+        font = "GeistMono Nerd Font: size=12";
+        pad = "10x10";
       };
       scrollback = {
         lines = 100000;
