@@ -3,8 +3,7 @@
         "position": "bottom",
         "height": 18,
         "spacing": 5,
-        "modules-left": ["hyprland/workspaces"],
-        "modules-center": ["hyprland/window"],
+        "modules-left": ["hyprland/workspaces", "hyprland/window"],
         "modules-right": ["hyprland/language","temperature","battery","pulseaudio","clock"],
         "hyprland/window": {
             "format": "{}"
@@ -13,14 +12,6 @@
             "disable-scroll": true,
             "all-outputs": true,
             "format": "{icon}",
-            "persistent-workspaces": {
-            "1": [],
-            "2": [],
-            "3": [],
-            "4": [],
-            "5": [],
-            "6": [],
-            },
             "format-icons": {
             "1": "I",
             "2": "II",
@@ -29,7 +20,8 @@
             "5": "V",
             "6": "VI",
             }        },
-        "temperature": {
+
+            "temperature": {
             "critical-threshold": 90,
             "interval": 5,
             "format": "{icon} {temperatureC}°",
@@ -43,7 +35,9 @@
             "tooltip": false
         },
         "hyprland/language": {
-            "format": "  {}",
+            "format": "   {}",
+            "format-en": "us",
+            "format-tr": "tr",
             "min-length": 5,
             "on-click": "hyprctl switchxkblayout all next",
             "tooltip": false
@@ -56,11 +50,11 @@
                 "critical": 15
             },
             "format-time": "{H}:{M:02}",
-            "format": "{icon} {capacity}% ({time})",
-            "format-charging": " {capacity}% ({time})",
-            "format-full": "{icon} {capacity}%",
-            "format-alt": "{icon} {power}W",
-            "format-plugged": " {capacity}%",
+            "format": "{icon}   {capacity}% ({time})",
+            "format-charging": "   {capacity}% ({time})",
+            "format-full": "{icon}   {capacity}%",
+            "format-alt": "{icon}   {power}W",
+            "format-plugged": "   {capacity}%",
             "format-icons": [
                 "",
             "",
@@ -81,7 +75,7 @@
             }
         },
         "pulseaudio": {
-            "format": "{icon}  {volume}%",
+            "format": "{icon}   {volume}%",
             "format-icons": {
                 "default": ["\uf026", "\uf027", "\uf028"]
             },

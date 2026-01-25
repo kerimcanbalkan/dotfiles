@@ -5,6 +5,7 @@
       nerd-fonts.gohufont
       nerd-fonts.geist-mono
       alegreya
+      aporetic
       montserrat
     ];
 

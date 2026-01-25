@@ -13,6 +13,7 @@
     ./foot.nix
     ./gaming.nix
     ./hyprland.nix
+    ./theming.nix
     ./networking.nix
     ./power.nix
     ./printing.nix

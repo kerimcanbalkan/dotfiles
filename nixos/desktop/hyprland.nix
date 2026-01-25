@@ -33,6 +33,7 @@
     grim
     hypridle
     hyprlock
+    hyprpaper
     hyprpicker
     hyprsunset
     hyprutils
@@ -41,6 +42,7 @@
     slurp
     swaynotificationcenter
     swww
+    wofi
     waybar
     wl-clipboard
     wl-kbptr
