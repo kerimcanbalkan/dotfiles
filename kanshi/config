@@ -6,5 +6,5 @@ profile docked {
 
 # When no external monitor is connected, enable laptop screen
 profile laptop {
-    output eDP-1 enable scale 1.5
+    output eDP-1 enable scale 1
 }

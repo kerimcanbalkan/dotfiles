@@ -62,7 +62,7 @@ in
       vterm
     ];
   };
- 
+
   services.mako = {
     enable = true;
     settings = {

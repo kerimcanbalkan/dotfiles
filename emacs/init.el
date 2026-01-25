@@ -106,7 +106,7 @@
   ;; Configure font settings based on the operating system.
   ;; Ok, this kickstart is meant to be used on the terminal, not on GUI.
   ;; But without this, I fear you could start Graphical Emacs and be sad :(
-  (set-face-attribute 'default nil :family "Aporetic Sans Mono"  :height 100)
+  (set-face-attribute 'default nil :family "Aporetic Sans Mono"  :height 120)
   (when (eq system-type 'darwin)       ;; Check if the system is macOS.
     (setq mac-command-modifier 'meta)  ;; Set the Command key to act as the Meta key.
     (set-face-attribute 'default nil :family "Aporetic Sans Mono" :height 110))
@@ -1192,27 +1192,26 @@
       smtpmail-smtp-server "smtp.gmail.com"
       smtpmail-smtp-service 587)
 
-(use-package pdf-tools
-  :ensure t
-  :magic ("%PDF" . pdf-view-mode)
-  :straight t
-  :hook
-  (pdf-view-mode . midnight-mode)
-  (pdf-view-mode . (lambda ()
-                     (setq-local mode-line-format nil)))
-  :custom
-  (pdf-view-use-unicode-ligther nil)
-  (pdf-view-page-broken-lines nil)
-  (pdf-view-disp-ctrl-overlay nil)
+;; (use-package pdf-tools
+;;   :ensure t
+;;   :magic ("%PDF" . pdf-view-mode)
+;;   :straight t
+;;   :hook
+;;   (pdf-view-mode . midnight-mode)
+;;   (pdf-view-mode . (lambda ()
+;;                      (setq-local mode-line-format nil)))
+;;   :custom
+;;   (pdf-view-use-unicode-ligther nil)
+;;   (pdf-view-page-broken-lines nil)
+;;   (pdf-view-disp-ctrl-overlay nil)
 
-  (pdf-view-midnight-colors '("#c5c9c5" . "#181616"))
-  :config
-  (pdf-tools-install))
+;;   (pdf-view-midnight-colors '("#c5c9c5" . "#181616"))
+;;   :config
+;;   (pdf-tools-install))
 
-
-(use-package nov
-  :ensure t
-  :straight t)
+;; (use-package nov
+;;   :ensure t
+;;   :straight t)
 
 (use-package envrc
   :config
