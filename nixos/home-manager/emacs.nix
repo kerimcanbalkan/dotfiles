@@ -7,6 +7,7 @@
       epkgs: with epkgs; [
         vterm
         treesit-grammars.with-all-grammars
+        mu4e
       ];
   };
 

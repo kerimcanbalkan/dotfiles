@@ -37,7 +37,6 @@
 (straight-use-package '(project :type built-in))
 (straight-use-package 'use-package)
 
-
 (require 'package)
 
 ;; Add MELPA (Milkypostman's Emacs Lisp Package Archive) to the list of package archives.
@@ -50,6 +49,9 @@
   :type 'boolean
   :group 'appearance)
 
+;; Transparency
+(set-frame-parameter (selected-frame) 'alpha '(80 . 80))
+(add-to-list 'default-frame-alist '(alpha . (80 . 80)))
 
 ;; (use-package some-package
 ;;   :ensure t     ;; Ensure the package is installed (used with package.el).
@@ -101,7 +103,6 @@
     "Function for `switch-to-prev-buffer-skip'."
     (string-match "\\*[^*]+\\*" (buffer-name buffer)))
   (setq switch-to-prev-buffer-skip 'skip-these-buffers)
-
 
   ;; Configure font settings based on the operating system.
   ;; Ok, this kickstart is meant to be used on the terminal, not on GUI.
