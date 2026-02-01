@@ -8,6 +8,7 @@
     ./gpg.nix
     ./nvim.nix
     ./git.nix
+    ./firefox.nix
   ];
 
   home.username = "kerim";
