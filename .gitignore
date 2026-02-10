@@ -21,3 +21,5 @@ emacs/straight/
 emacs/transient/
 emacs/tree-sitter/
 emacs/tramp
+emacs/.lsp-session
+emacs/projects

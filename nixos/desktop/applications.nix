@@ -16,6 +16,7 @@
 
     # Productivity
     libreoffice-fresh
+    harper
 
     # System utilities
     brightnessctl

@@ -3,7 +3,6 @@
 {
   programs.gpg.enable = true;
 
-
   services.gpg-agent = {
     enable = true;
     enableSshSupport = true;
@@ -11,6 +10,7 @@
     maxCacheTtl = 86400;
     pinentry.package = pkgs.pinentry-qt;
     extraConfig = ''
+      allow-emacs-pinentry
       allow-loopback-pinentry
     '';
   };
