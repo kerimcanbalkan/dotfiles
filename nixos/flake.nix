@@ -27,7 +27,7 @@
             users.kerim = import ./home.nix;
             backupFileExtension = "backup";
           };
-        } 
+        }
       ];
     };
   };

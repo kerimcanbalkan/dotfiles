@@ -17,7 +17,6 @@
   (create-lockfiles nil)                          ;; Prevent the creation of lock files when editing.
   (delete-by-moving-to-trash t)                   ;; Move deleted files to the trash instead of permanently deleting them.
   (delete-selection-mode 1)                       ;; Enable replacing selected text with typed text.
-  (display-line-numbers-type 'relative)           ;; Use relative line numbering in programming modes.
   (global-auto-revert-non-file-buffers t)         ;; Automatically refresh non-file buffers.
   (history-length 25)                             ;; Set the length of the command history.
   (indent-tabs-mode nil)                          ;; Disable the use of tabs for indentation (use spaces instead).
@@ -42,15 +41,17 @@
   (use-short-answers t)                           ;; Use short answers in prompts for quicker responses (y instead of yes)
   (warning-minimum-level :emergency)              ;; Set the minimum level of warnings to display.
   (browse-url-browser-function 'eww-browse-url)
+  (next-line-add-newlines t)
+  (doc-view-continuous t)
   :hook                                           ;; Add hooks to enable specific features in certain modes.
   (prog-mode . display-line-numbers-mode)         ;; Enable line numbers in programming modes.
+  (doc-view-mode-hook . save-place-mode)
+  (doc-view-mode-hook . auto-revert--mode)
   :bind
   (("M-o" . other-window)
    ("C-c t" . vterm)
    ("C-c b k" . kill-current-buffer)
    ("C-c b" . browse-url)
-   ("C-c e n" . flymake-goto-next-error)
-   ("C-c e p" . flymake-goto-next-error)
    ("M-TAB" . completion-at-point)
    ("C-c l" . org-store-link)
    ("C-c a" . org-agenda)
@@ -61,7 +62,7 @@
 
   ;; Set theme
   (load-theme 'wombat)
-  
+
   ;; Transparency
   (add-to-list 'default-frame-alist '(alpha-background . 80))
 
@@ -147,16 +148,27 @@
   :ensure nil
   :defer t
   :hook (prog-mode . flymake-mode)
+  :bind (:map flymake-mode-map
+              ("M-n" . flymake-goto-next-error)
+              ("M-p" . flymake-goto-next-error))
   :custom
+  (flymake-show-diagnostics-at-end-of-line 'short)
+  (flymake-indicator-type 'margins)
   (flymake-margin-indicators-string
-   '((error "!»" compilation-error) (warning "»" compilation-warning)
-     (note "»" compilation-info))))
+   `((error "!" compilation-error)
+     (warning "?" compilation-warning)
+     (note "i" compilation-info))))
 
 (use-package which-key
   :ensure nil
   :defer t
   :hook
   (after-init . which-key-mode))
+
+(use-package whitespace
+  :ensure nil
+  :defer t
+  :hook (before-save-hook . whitespace-cleanup))
 
 (use-package org
   :ensure nil
@@ -183,12 +195,31 @@
      )))
 
 (use-package icomplete
-  :ensure nil
-  :custom
-  (icomplete-in-buffer t)
-  (icomplete-with-completion-tables t)
+  :bind (:map icomplete-minibuffer-map
+              ("C-n" . icomplete-forward-completions)
+              ("C-p" . icomplete-backward-completions)
+              ("C-v" . icomplete-vertical-toggle)
+              ("RET" . icomplete-force-complete-and-exit))
+  :hook
+  (after-init . (lambda ()
+                  (fido-mode -1)
+                  (icomplete-vertical-mode 1)
+                  ))
   :config
-  (icomplete-vertical-mode t))
+  (setq tab-always-indent 'complete)  ;; Starts completion with TAB
+  (setq icomplete-delay-completions-threshold 0)
+  (setq icomplete-compute-delay 0)
+  (setq icomplete-show-matches-on-no-input t)
+  (setq icomplete-hide-common-prefix nil)
+  (setq icomplete-prospects-height 10)
+  (setq icomplete-separator " . ")
+  (setq icomplete-with-completion-tables t)
+  (setq icomplete-in-buffer t)
+  (setq icomplete-max-delay-chars 0)
+  (setq icomplete-scroll t)
+  (advice-add 'completion-at-point
+              :after #'minibuffer-hide-completions
+              ))
 
 ;; Setup lsp
 (use-package eglot
@@ -200,6 +231,13 @@
                  tsx-ts-mode
                  lua-mode)
          . eglot-ensure)
+  :bind (:map
+         eglot-mode-map
+         ("C-c l a" . eglot-code-actions)
+         ("C-c l o" . eglot-code-action-organize-imports)
+         ("C-c l r" . eglot-rename)
+         ("C-c l i" . eglot-inlay-hints-mode)
+         ("C-c l f" . eglot-format-buffer))
   :config
   (add-to-list 'eglot-server-programs
                '(text-mode . ("harper-ls" "--stdio")))
@@ -312,19 +350,19 @@
   :ensure t
   :mode "\\.nix\\'")
 
-(use-package corfu
-  :ensure t
-  :custom
-  (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-  (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
-  (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
-  (corfu-preview-current nil)    ;; Disable current candidate preview
-  (corfu-preselect 'prompt)      ;; Preselect the prompt
-  (corfu-on-exact-match 'insert) ;; Configure handling of exact matches
-  :init
-  (global-corfu-mode)
-  (corfu-history-mode)
-  (corfu-popupinfo-mode))
+;; (use-package corfu
+;;   :ensure t
+;;   :custom
+;;   (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+;;   (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
+;;   (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
+;;   (corfu-preview-current nil)    ;; Disable current candidate preview
+;;   (corfu-preselect 'prompt)      ;; Preselect the prompt
+;;   (corfu-on-exact-match 'insert) ;; Configure handling of exact matches
+;;   :init
+;;   (global-corfu-mode)
+;;   (corfu-history-mode)
+;;   (corfu-popupinfo-mode))
 
 (use-package magit
   :ensure t
@@ -366,12 +404,24 @@
 ;; Reading News
 (use-package newsticker
   :ensure nil
+  :custom
+  (newsticker-retrieval-interval 0) ;; Only fetches when first opening (avoids unwanted fetching/ui locking while doing other things later)
+  (newsticker-treeview-treewindow-width 40)
+  (newsticker-dir (expand-file-name "cache/newsticker/" user-emacs-directory))
+  (newsticker-retrieval-method (if (executable-find "wget") 'extern 'intern))
+  (newsticker-wget-arguments
+   '("--quiet"
+     "--no-hsts"
+     "--output-document=-"
+     "--append-output=/dev/null"))
   :config
   (setq newsticker-url-list
         '(("Null Program" "http://nullprogram.com/feed/" nil 3600)
           ("Protesilaos" "https://protesilaos.com/master.xml" nil 3600)
           ("Evrensel" "https://www.evrensel.net/rss/haber.xml" nil 3600)
           ("Joshua Blais" "https://joshblais.com/index.xml" nil 3600)
+          ("Richard Stallman" "https://stallman.org/rss/rss.xml" nil 3600)
           ("Jacobin" "https://jacobin.com/feed" nil 3600)
+          ("Rahul M. Juliato" "https://www.rahuljuliato.com/rss.xml" nil 3600)
           ("Emacs Life" "https://planet.emacslife.com/atom.xml" nil 3600))))
 ;;; init.el ends here

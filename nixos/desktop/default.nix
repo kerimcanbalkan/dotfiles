@@ -12,8 +12,7 @@
     ./fonts.nix
     ./foot.nix
     ./gaming.nix
-#    ./hyprland.nix
-    ./kde.nix
+    ./hyprland.nix
     ./theming.nix
     ./networking.nix
     ./power.nix

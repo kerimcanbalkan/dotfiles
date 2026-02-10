@@ -10,5 +10,6 @@
     gnumake
     sdbus-cpp
     pciutils
+    lspmux # Lsp multiplexer
   ];
 }

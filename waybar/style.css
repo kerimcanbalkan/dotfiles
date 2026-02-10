@@ -1,11 +1,12 @@
 * {
     font-family: "Aporetic Sans Mono";
-    font-size: 18px;
-}
+    font-size: 16px;
+ }
 
 #waybar {
     background-color: rgba(22, 22, 29, 0.5);
     color: #DCD7BA;
+
 }
 
 button {
@@ -52,12 +53,12 @@ button {
 
 
 .modules-left>widget:first-child>#workspaces {
-    margin-left: 0;
+    margin-left: 0px;
 }
 
 
 .modules-right>widget:last-child>#workspaces {
-    margin-right: 5;
+    margin-right: 5px;
 }
 
 @keyframes blink {

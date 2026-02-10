@@ -41,4 +41,32 @@
 (push '(vertical-scroll-bars) default-frame-alist) ;; Disable the scroll bar
 (setq-default line-spacing 0.12)
 
+;; Better Window Management handling
+(setq frame-resize-pixelwise t
+      frame-inhibit-implied-resize t
+      frame-title-format
+      '(:eval
+        (let ((project (project-current)))
+          (if project
+              (concat "Emacs - [p] " (project-name project))
+              (concat "Emacs - " (buffer-name))))))
+
+(when (eq system-type 'darwin)
+  (setq ns-use-proxy-icon nil))
+
+(setq inhibit-compacting-font-caches t)
+
+;; Disables unused UI Elements
+(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
+(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+(if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
+(if (fboundp 'tooltip-mode) (tooltip-mode -1))
+(if (fboundp 'fringe-mode) (fringe-mode -1))
+
+
+;; Avoid raising the *Messages* buffer if anything is still without
+;; lexical bindings
+(setq warning-minimum-level :error)
+(setq warning-suppress-types '((lexical-binding)))
+
 (setq package-enable-at-startup t)
