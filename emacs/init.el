@@ -364,9 +364,9 @@
 ;;   (corfu-history-mode)
 ;;   (corfu-popupinfo-mode))
 
-(use-package magit
-  :ensure t
-  :defer t)
+;; (use-package magit
+;;   :ensure t
+;;   :defer t)
 
 ;; Email setup
 (use-package mu4e

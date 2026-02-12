@@ -27,7 +27,7 @@
 
     imv
     mpv
-    mupdf
+    zathura
     mako
     grim
     slurp
@@ -39,5 +39,5 @@
     # ADB tooling for android
     android-tools
   ];
-  
+
 }

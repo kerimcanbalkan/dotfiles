@@ -11,6 +11,7 @@
       ];
   };
 
+
   # Add the systemd user service
   systemd.user.services.emacs = {
     Unit = {
@@ -27,11 +28,11 @@
 
       Environment = [
         "PATH=${config.home.profileDirectory}/bin:/run/current-system/sw/bin"
-        "GDK_BACKEND=x11"
+        "XDG_CURRENT_DESKTOP=Hyprland"
+        "XDG_SESSION_TYPE=wayland"
       ];
     };
 
     Install.WantedBy = [ "graphical-session.target" ];
   };
-
 }

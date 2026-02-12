@@ -3,5 +3,6 @@
 {
   imports = [
     ./core-utils.nix
+    ./rass.nix
   ];
 }
