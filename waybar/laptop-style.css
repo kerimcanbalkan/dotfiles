@@ -1,0 +1,97 @@
+* {
+    font-family: "Aporetic Sans Mono";
+ }
+
+#waybar {
+    background-color: rgba(22, 22, 29, 0.5);
+    color: #DCD7BA;
+    font-size: 14px;
+}
+
+@media (max-resolution: 96dpi) {
+  #waybar {
+    font-size: 11px;
+  }
+}
+
+@media (min-resolution: 120dpi) {
+  #waybar {
+    font-size: 16px;
+  }
+}
+
+button {
+    border: none;
+    border-radius: 0;
+    padding: 0 5px;
+}
+
+#workspaces button {
+    background-color: rgba(22, 22, 29, 0.5);
+    color: #C8C093;
+}
+
+#workspaces button:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+#workspaces button.focused {
+    background-color: rgba(153, 170, 187, 0.5);
+    color: #DCD7BA;
+}
+
+#workspaces button.urgent {
+    background-color: rgba(73, 68, 60, 0.5);
+}
+
+#workspaces button.active {
+    background-color: rgba(101, 133, 148, 0.5);
+}
+
+#clock,
+#battery,
+#cpu,
+#memory,
+#pulseaudio,
+#tray,
+#temperature,
+#mode,
+#idle_inhibitor,
+#window,
+#workspaces {
+    margin: 0 8px;
+}
+
+
+.modules-left>widget:first-child>#workspaces {
+    margin-left: 0px;
+}
+
+
+.modules-right>widget:last-child>#workspaces {
+    margin-right: 5px;
+}
+
+@keyframes blink {
+    to {
+        color: #ebdbb2;
+    }
+}
+
+#battery.critical:not(.charging) {
+    color: #E82424;
+    animation-name: blink;
+    animation-duration: 0.5s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+}
+
+#battery.warning:not(.charging) {
+    color: #FF9E3B;
+}
+
+
+label:focus {
+    background-color: #16161D;
+}

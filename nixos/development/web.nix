@@ -11,6 +11,8 @@
     astro-language-server
     nodejs_24
     nodePackages.prettier
+    eslint
     eas-cli
+    tailwindcss-language-server
   ];
 }

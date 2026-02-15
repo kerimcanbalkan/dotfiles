@@ -43,13 +43,16 @@
   (browse-url-browser-function 'eww-browse-url)
   (next-line-add-newlines t)
   (doc-view-continuous t)
+  (user-mail-address "kerimcanbalkan@gmail.com"
+                     user-full-name "Kerimcan Balkan")
+
   :hook                                           ;; Add hooks to enable specific features in certain modes.
   (prog-mode . display-line-numbers-mode)         ;; Enable line numbers in programming modes.
   (doc-view-mode-hook . save-place-mode)
   (doc-view-mode-hook . auto-revert--mode)
   :bind
   (("M-o" . other-window)
-   ("C-c t" . vterm)
+   ("C-c t" . eshell)
    ("C-c b k" . kill-current-buffer)
    ("C-c b" . browse-url)
    ("M-TAB" . completion-at-point)
@@ -61,7 +64,7 @@
   (set-face-attribute 'default nil :family "Aporetic Sans Mono"  :height 120)
 
   ;; Set theme
-  (load-theme 'wombat)
+  ;;(load-theme 'wombat)
 
   ;; Transparency
   (add-to-list 'default-frame-alist '(alpha-background . 80))
@@ -134,6 +137,16 @@
       (slot . 1))
      )))
 
+(use-package eldoc
+  :ensure nil
+  :custom
+  (eldoc-help-at-pt t)
+  (eldoc-echo-area-use-multiline-p nil)
+  (eldoc-echo-area-prefer-doc-buffer t)
+  (eldoc-documentation-strategy 'eldoc-documentation-compose)
+  :init
+  (global-eldoc-mode))
+
 (use-package isearch
   :ensure nil
   :config
@@ -152,7 +165,6 @@
               ("M-n" . flymake-goto-next-error)
               ("M-p" . flymake-goto-next-error))
   :custom
-  (flymake-show-diagnostics-at-end-of-line 'short)
   (flymake-indicator-type 'margins)
   (flymake-margin-indicators-string
    `((error "!" compilation-error)
@@ -206,7 +218,6 @@
                   (icomplete-vertical-mode 1)
                   ))
   :config
-  (setq tab-always-indent 'complete)  ;; Starts completion with TAB
   (setq icomplete-delay-completions-threshold 0)
   (setq icomplete-compute-delay 0)
   (setq icomplete-show-matches-on-no-input t)
@@ -214,12 +225,8 @@
   (setq icomplete-prospects-height 10)
   (setq icomplete-separator " . ")
   (setq icomplete-with-completion-tables t)
-  (setq icomplete-in-buffer t)
   (setq icomplete-max-delay-chars 0)
-  (setq icomplete-scroll t)
-  (advice-add 'completion-at-point
-              :after #'minibuffer-hide-completions
-              ))
+  (setq icomplete-scroll t))
 
 ;; Setup lsp
 (use-package eglot
@@ -227,10 +234,21 @@
   :hook ((c-mode c++-mode
                  go-ts-mode go-mode
                  web-mode js-ts-mode
-                 org-mode text-mode
                  tsx-ts-mode
                  lua-mode)
          . eglot-ensure)
+  :init
+  (with-eval-after-load 'eglot
+    (add-to-list
+     'eglot-server-programs
+     '((tsx-ts-mode typescript-ts-mode js-mode js-jsx-mode js-ts-mode)
+       . ("rass"
+          "--"
+          "typescript-language-server" "--stdio"
+          "--"
+          "vscode-eslint-language-server" "--stdio"
+          "--"
+          "tailwindcss-language-server" "--stdio"))))
   :bind (:map
          eglot-mode-map
          ("C-c l a" . eglot-code-actions)
@@ -239,15 +257,32 @@
          ("C-c l i" . eglot-inlay-hints-mode)
          ("C-c l f" . eglot-format-buffer))
   :config
+  (add-hook 'before-save-hook 'eglot-format-buffer t t)
+  (setq-default eglot-workspace-configuration
+                '((:tailwindCSS
+                   (:includeLanguages
+                    (:typescriptreact "html"
+                                      :typescript "html"
+                                      :javascript "html"
+                                      :javascriptreact "html")))))
+  (setq-default eglot-workspace-configuration (quote
+                                               (:gopls (:hints (:parameterNames t)))))
+  (setq eglot-ignored-server-capabilities '( :documentHighlightProvider))
+  (setf (plist-get eglot-events-buffer-config :size) 0)
   (add-to-list 'eglot-server-programs
                '(text-mode . ("harper-ls" "--stdio")))
   (add-to-list 'eglot-server-programs
                '(org-mode  . ("harper-ls" "--stdio")))
   :custom
-  (eglot-events-buffer-size 0) ;; No event buffers (LSP server logs)
-  (eglot-autoshutdown t);; Shutdown unused servers.
-  (eglot-report-progress nil) ;; Disable LSP server logs (Don't show lsp messages at the bottom, java)
-  )
+  (fset #'jsonrpc--log-event #'ignore)
+  (eglot-events-buffer-size 0)
+  (eglot-sync-connect nil)
+  (eglot-connect-timeout nil)
+  (eglot-autoshutdown t)
+  (eglot-send-changes-idle-time 3)
+  (flymake-no-changes-timeout 5)
+  (eldoc-echo-area-use-multiline-p nil)
+  (eglot-report-progress nil))
 
 (use-package project
   :ensure nil
@@ -265,18 +300,13 @@
 (use-package go-ts-mode
   :mode "\\.go\\'"
   :ensure nil
-  :hook (go-ts-mode . my/go-format-on-save)
+  :hook (go-ts-mode . my/go-setup)
   :config
-  (defun my/go-format-on-save ()
-    (add-hook 'before-save-hook #'gofmt-buffer nil t))
-
-  (defun my/gofmt-buffer ()
-    (when (and (executable-find "gofmt")
-               (buffer-file-name))
-      (call-process-region
-       (point-min) (point-max)
-       "gofmt"
-       t t nil))))
+  (defun my/go-setup ()
+    "Set Go indentation"
+    ;; Use tabs for Go, standard Go tab width
+    (setq-local indent-tabs-mode t)
+    (setq-local tab-width 8)))
 
 ;; Format with prettier
 (defun my/find-local-prettier ()
@@ -329,11 +359,15 @@
 (use-package tsx-ts-mode
   :ensure nil
   :hook (tsx-ts-mode . my/enable-prettier-on-save)
+  :custom
+  (tab-width 4)
   :mode "\\.tsx\\'")
 
 (use-package typescript-ts-mode
   :ensure nil
   :hook (typescript-ts-mode . my/enable-prettier-on-save)
+  :custom
+  (typescript-ts-mode-indent-offset 4)
   :mode "\\.ts\\'")
 
 (use-package html-ts-mode
@@ -346,23 +380,69 @@
   :hook (css-ts-mode . my/enable-prettier-on-save)
   :mode "\\.css\\'")
 
+;; Reading News
+(use-package newsticker
+  :ensure nil
+  :custom
+  (newsticker-retrieval-interval 0) ;; Only fetches when first opening (avoids unwanted fetching/ui locking while doing other things later)
+  (newsticker-treeview-treewindow-width 40)
+  (newsticker-dir (expand-file-name "cache/newsticker/" user-emacs-directory))
+  (newsticker-retrieval-method (if (executable-find "wget") 'extern 'intern))
+  (newsticker-wget-arguments
+   '("--quiet"
+     "--no-hsts"
+     "--output-document=-"
+     "--append-output=/dev/null"))
+  :config
+  (setq newsticker-url-list
+        '(("Null Program" "http://nullprogram.com/feed/" nil 3600)
+          ("Protesilaos" "https://protesilaos.com/master.xml" nil 3600)
+          ("Evrensel" "https://www.evrensel.net/rss/haber.xml" nil 3600)
+          ("Joshua Blais" "https://joshblais.com/index.xml" nil 3600)
+          ("Richard Stallman" "https://stallman.org/rss/rss.xml" nil 3600)
+          ("Jacobin" "https://jacobin.com/feed" nil 3600)
+          ("Rahul M. Juliato" "https://www.rahuljuliato.com/rss.xml" nil 3600)
+          ("Emacs Life" "https://planet.emacslife.com/atom.xml" nil 3600))))
+
+
+
+;;; External Packages
+(use-package doric-themes
+  :ensure t
+  :demand t
+  :config
+  ;; These are the default values.
+  (setq doric-themes-to-toggle '(doric-earth doric-fire))
+  (setq doric-themes-to-rotate doric-themes-collection)
+
+  (doric-themes-select 'doric-fire)
+
+  :bind
+  (("<f5>" . doric-themes-toggle)
+   ("C-<f5>" . doric-themes-select)
+   ("M-<f5>" . doric-themes-rotate)))
+
+(use-package corfu
+  :ensure t
+  :custom
+  (corfu-auto t)
+  (corfu-auto-prefix 2)
+  (corfu-auto-delay 0.25)
+  (corfu-echo-documentation 0.5)
+  (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+  (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
+  (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
+  (corfu-preview-current nil)    ;; Disable current candidate preview
+  (corfu-preselect 'prompt)      ;; Preselect the prompt
+  (corfu-on-exact-match 'insert) ;; Configure handling of exact matches
+  :init
+  (global-corfu-mode)
+  (corfu-history-mode)
+  (corfu-popupinfo-mode))
+
 (use-package nix-mode
   :ensure t
   :mode "\\.nix\\'")
-
-;; (use-package corfu
-;;   :ensure t
-;;   :custom
-;;   (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-;;   (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
-;;   (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
-;;   (corfu-preview-current nil)    ;; Disable current candidate preview
-;;   (corfu-preselect 'prompt)      ;; Preselect the prompt
-;;   (corfu-on-exact-match 'insert) ;; Configure handling of exact matches
-;;   :init
-;;   (global-corfu-mode)
-;;   (corfu-history-mode)
-;;   (corfu-popupinfo-mode))
 
 ;; (use-package magit
 ;;   :ensure t
@@ -393,35 +473,10 @@
       (:maildir "/[Gmail]/Trash"     :key ?t)
       (:maildir "/[Gmail]/Drafts"    :key ?d)
       (:maildir "/[Gmail]/All Mail"  :key ?a)))
-
-(setq message-send-mail-function 'smtpmail-send-it
-      smtpmail-starttls-credentials '(("smtp.gmail.com" 587 nil nil))
-      smtpmail-auth-credentials '(("smtp.gmail.com" 587 "kerimcanbalkan@gmail.com" nil))
-      smtpmail-default-smtp-server "smtp.gmail.com"
-      smtpmail-smtp-server "smtp.gmail.com"
-      smtpmail-smtp-service 587))
-
-;; Reading News
-(use-package newsticker
-  :ensure nil
-  :custom
-  (newsticker-retrieval-interval 0) ;; Only fetches when first opening (avoids unwanted fetching/ui locking while doing other things later)
-  (newsticker-treeview-treewindow-width 40)
-  (newsticker-dir (expand-file-name "cache/newsticker/" user-emacs-directory))
-  (newsticker-retrieval-method (if (executable-find "wget") 'extern 'intern))
-  (newsticker-wget-arguments
-   '("--quiet"
-     "--no-hsts"
-     "--output-document=-"
-     "--append-output=/dev/null"))
-  :config
-  (setq newsticker-url-list
-        '(("Null Program" "http://nullprogram.com/feed/" nil 3600)
-          ("Protesilaos" "https://protesilaos.com/master.xml" nil 3600)
-          ("Evrensel" "https://www.evrensel.net/rss/haber.xml" nil 3600)
-          ("Joshua Blais" "https://joshblais.com/index.xml" nil 3600)
-          ("Richard Stallman" "https://stallman.org/rss/rss.xml" nil 3600)
-          ("Jacobin" "https://jacobin.com/feed" nil 3600)
-          ("Rahul M. Juliato" "https://www.rahuljuliato.com/rss.xml" nil 3600)
-          ("Emacs Life" "https://planet.emacslife.com/atom.xml" nil 3600))))
+  (setq message-send-mail-function 'smtpmail-send-it)
+  (setq smtpmail-smtp-server "smtp.gmail.com"
+                        smtpmail-smtp-service 587
+                        smtpmail-stream-type 'starttls
+                        smtpmail-smtp-user "kerimcanbalkan@gmail.com"
+                        smtpmail-auth-credentials "~/.authinfo.gpg"))
 ;;; init.el ends here

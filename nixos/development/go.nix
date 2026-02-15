@@ -14,4 +14,8 @@
     golangci-lint
     delve
   ];
+
+  environment.variables = {
+    GOPLS_FORMAT_TOOL = "gofumpt";
+  };
 }

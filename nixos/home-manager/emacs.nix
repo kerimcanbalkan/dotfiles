@@ -5,9 +5,9 @@
     package = pkgs.emacs;
     extraPackages =
       epkgs: with epkgs; [
-        vterm
         treesit-grammars.with-all-grammars
         mu4e
+        exwm
       ];
   };
 

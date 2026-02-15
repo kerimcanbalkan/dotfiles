@@ -12,7 +12,6 @@ in
     ".config/nvim".source = mkOutOfStoreSymlink "${configDir}/nvim";
     ".config/waybar".source = mkOutOfStoreSymlink "${configDir}/waybar";
     ".config/emacs".source = mkOutOfStoreSymlink "${configDir}/emacs";
-    ".config/wofi".source = mkOutOfStoreSymlink "${configDir}/wofi";
     ".config/swaync".source = mkOutOfStoreSymlink "${configDir}/swaync";
   };
 }
