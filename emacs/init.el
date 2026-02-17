@@ -7,8 +7,14 @@
 ;;; Commentary:
 ;; It says this part is necessary I do not get why
 
-;;; Code:
+;;; Setup EXWM
+(add-to-list 'load-path "~/dotfiles/exwm/")
 
+;; Load your EXWM config
+(load "exwm") ;; Emacs will look for exwm.el in the load-path
+
+
+;;; Code:
 (use-package emacs
   :ensure nil
   :custom                                         ;; Set custom variables to configure Emacs behavior.
@@ -45,8 +51,9 @@
   (doc-view-continuous t)
   (user-mail-address "kerimcanbalkan@gmail.com"
                      user-full-name "Kerimcan Balkan")
-
-  :hook                                           ;; Add hooks to enable specific features in certain modes.
+  (read-extended-command-predicate #'command-completion-default-include-p)
+  (text-mode-ispell-word-completion nil)
+    :hook                                           ;; Add hooks to enable specific features in certain modes.
   (prog-mode . display-line-numbers-mode)         ;; Enable line numbers in programming modes.
   (doc-view-mode-hook . save-place-mode)
   (doc-view-mode-hook . auto-revert--mode)
@@ -435,6 +442,9 @@
   (corfu-preview-current nil)    ;; Disable current candidate preview
   (corfu-preselect 'prompt)      ;; Preselect the prompt
   (corfu-on-exact-match 'insert) ;; Configure handling of exact matches
+  :bind
+  (:map corfu-map
+        ("C-j" . corfu-insert))
   :init
   (global-corfu-mode)
   (corfu-history-mode)

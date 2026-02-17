@@ -10,14 +10,15 @@
     ./communication.nix
     ./display-manager.nix
     ./fonts.nix
-    ./foot.nix
+    # ./foot.nix
     ./gaming.nix
-    #    ./hyprland.nix
+    # ./hyprland.nix
     ./cinnamon.nix
-    ./theming.nix
+    # ./theming.nix
     ./networking.nix
     ./power.nix
     ./email.nix
     ./printing.nix
+    ./exwm.nix
   ];
 }

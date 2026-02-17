@@ -2,6 +2,7 @@
 
 {
   environment.systemPackages = with pkgs; [
+    ripgrep
     # Modern CLI replacements
     eza # ls → eza
     bat # cat → bat

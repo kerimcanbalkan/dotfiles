@@ -26,6 +26,42 @@
 ;; Increase the amount of data which Emacs reads from the process
 (setq read-process-output-max (* 1024 1024)) ;; 1mb
 
+(push '(fullscreen . maximized) default-frame-alist)
+
+(setq initial-frame-alist `((horizontal-scroll-bars . nil)
+                            (menu-bar-lines . 0)
+                            (tool-bar-lines . 0)
+                            (vertical-scroll-bars . nil)
+                            (scroll-bar-width . ,(if prot-pgtk-p 12 6))
+                            (width . (text-pixels . 800))
+                            (height . (text-pixels . 900))
+                            ,@(unless prot-pgtk-p
+                                (list '(undecorated . t)))
+                            (border-width . 0)
+                            ,@(when prot-laptop-p
+                                (list '(fullscreen . maximized)))))
+
+;; Do it again after init so that any intermediate changes are not
+;; retained.  Note that we cannot rely on setting this to
+;; `initial-frame-alist' as that may change in the meantime.  We
+;; explicitly set the value to be certain of the outcome.  This does
+;; not inhibit other programs from modifying the list, though I would
+;; consider it undesirable if they were touching these specific
+;; settings.
+(add-hook 'after-init-hook (lambda ()
+                             (setq default-frame-alist `((horizontal-scroll-bars . nil)
+                                                         (menu-bar-lines . 0)
+                                                         (tool-bar-lines . 0)
+                                                         (vertical-scroll-bars . nil)
+                                                         (scroll-bar-width . (if prot-pgtk-p 12 6))
+                                                         (width . (text-pixels . 800))
+                                                         (height . (text-pixels . 900))
+                                                         ,@(unless prot-pgtk-p
+                                                             (list '(undecorated . t)))
+                                                         (border-width . 0)
+                                                         ,@(when prot-laptop-p
+                                                             (list '(fullscreen . maximized)))))))
+
 ;; Unset file-name-handler-alist
 ;; About 0.07 faster
 (defvar last-file-name-handler-alist file-name-handler-alist)
