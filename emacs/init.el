@@ -7,12 +7,14 @@
 ;;; Commentary:
 ;; It says this part is necessary I do not get why
 
-;;; Setup EXWM
-(add-to-list 'load-path "~/dotfiles/exwm/")
+;; Load my custom functions
+(load (expand-file-name "kerim.el" user-emacs-directory))
 
-;; Load your EXWM config
-(load "exwm") ;; Emacs will look for exwm.el in the load-path
-
+;; Hopefully read environment variables
+(use-package exec-path-from-shell
+  :ensure t
+  :config
+  (exec-path-from-shell-initialize))
 
 ;;; Code:
 (use-package emacs
@@ -42,6 +44,7 @@
   (electric-pair-mode t)
   (electric-indent-mode t)
   (read-extended-command-predicate #'command-completion-default-include-p)
+  (project-vc-extra-root-markers '("Cargo.toml" "package.json" "go.mod")) ; Excelent for mono repos with multiple langs, makes Eglot happy
   (truncate-lines t)                              ;; Enable line truncation to avoid wrapping long lines.
   (use-dialog-box nil)                            ;; Disable dialog boxes in favor of minibuffer prompts.
   (use-short-answers t)                           ;; Use short answers in prompts for quicker responses (y instead of yes)
@@ -63,18 +66,19 @@
    ("C-c b k" . kill-current-buffer)
    ("C-c b" . browse-url)
    ("M-TAB" . completion-at-point)
+   ("<f5>" . my/toggle-theme)
    ("C-c l" . org-store-link)
    ("C-c a" . org-agenda)
    ("C-c l" . org-capture))
   :config
   ;; Set Font
-  (set-face-attribute 'default nil :family "Aporetic Sans Mono"  :height 120)
+  ;; (set-face-attribute 'default nil :family "Aporetic Sans Mono"  :height 120)
 
   ;; Set theme
-  ;;(load-theme 'wombat)
+  ;; (load-theme 'modus-operandi)
 
   ;; Transparency
-  (add-to-list 'default-frame-alist '(alpha-background . 80))
+  ;;(add-to-list 'default-frame-alist '(alpha-background . 90))
 
   ;; Save manual customizations to a separate file instead of cluttering init.el
   (setq custom-file (locate-user-emacs-file "custom-vars.el")) ;; Specify the custom file path.
@@ -144,6 +148,18 @@
       (slot . 1))
      )))
 
+(use-package man
+  :ensure nil
+  :hook (Man-mode . (lambda ()
+                      (setq Man-notify-method 'pushy)))
+  :config
+  (setq display-buffer-alist
+        '(("\\*Man.*\\*"
+           (display-buffer-reuse-window display-buffer-in-side-window)
+           (side . right)
+           (window-width . 0.5)
+           (slot . 0)))))
+
 (use-package eldoc
   :ensure nil
   :custom
@@ -177,6 +193,24 @@
    `((error "!" compilation-error)
      (warning "?" compilation-warning)
      (note "i" compilation-info))))
+
+(use-package flyspell
+  :ensure nil
+  :defer t
+  :config
+  (setq ispell-program-name "aspell")
+  (setq ispell-dictionary "en_US")
+  (ispell-set-spellchecker-params)
+  :hook
+  ((text-mode-hook . flyspell-mode)
+   (prog-mode-hook . flyspell-prog-mode)))
+
+(use-package uniquify
+  :ensure nil
+  :config
+  (setq uniquify-buffer-name-style 'forward)
+  (setq uniquify-strip-common-suffix t)
+  (setq uniquify-after-kill-buffer-p t))
 
 (use-package which-key
   :ensure nil
@@ -248,12 +282,12 @@
   (with-eval-after-load 'eglot
     (add-to-list
      'eglot-server-programs
-     '((tsx-ts-mode typescript-ts-mode js-mode js-jsx-mode js-ts-mode)
+     '((tsx-ts-mode js-jsx-mode)
        . ("rass"
           "--"
           "typescript-language-server" "--stdio"
           "--"
-          "vscode-eslint-language-server" "--stdio"
+          "eslint-lsp" "--stdio"
           "--"
           "tailwindcss-language-server" "--stdio"))))
   :bind (:map
@@ -295,13 +329,10 @@
   :ensure nil
   :bind (("C-x p p" . project-switch-project)
          ("C-x p f" . project-find-file)
+         ("C-x p d" . project-dired)
          ("C-x p g" . project-find-regexp)
          ("C-x p b" . project-switch-to-buffer)
-         ("C-x p k" . project-kill-buffers))
-  :custom
-  (project-shell-command 'vterm)
-  :config
-  (project-list-file "/home/kerim/dotfiles/emacs/projects"))
+         ("C-x p k" . project-kill-buffers)))
 
 ;; Coding
 (use-package go-ts-mode
@@ -315,52 +346,13 @@
     (setq-local indent-tabs-mode t)
     (setq-local tab-width 8)))
 
-;; Format with prettier
-(defun my/find-local-prettier ()
-  "Return path to local prettier or nil."
-  (let ((root (or (locate-dominating-file default-directory "node_modules")
-                  (locate-dominating-file default-directory "package.json"))))
-    (when root
-      (let ((prettier (expand-file-name "node_modules/.bin/prettier" root)))
-        (when (file-executable-p prettier)
-          prettier)))))
-
-(defun my/prettier-format-buffer ()
-  "Format current buffer using local prettier."
-  (interactive)
-  (when-let ((prettier (my/find-local-prettier)))
-    (let ((point (point)))
-      (call-process-region
-       (point-min) (point-max)
-       prettier
-       t   ; replace buffer
-       t   ; output to current buffer
-       nil
-       "--stdin-filepath" (buffer-file-name))
-      (goto-char point))))
-
-(defun my/prettier-format-buffer ()
-  "Format current buffer using local prettier."
-  (interactive)
-  (when-let ((prettier (my/find-local-prettier)))
-    (let ((point (point)))
-      (call-process-region
-       (point-min) (point-max)
-       prettier
-       t   ; replace buffer
-       t   ; output to current buffer
-       nil
-       "--stdin-filepath" (buffer-file-name))
-      (goto-char point))))
-
-(defun my/enable-prettier-on-save ()
-  (when (and (buffer-file-name)
-             (my/find-local-prettier))
-    (add-hook 'before-save-hook #'my/prettier-format-buffer nil t)))
 
 (use-package js-ts-mode
   :ensure nil
   :hook (js-ts-mode . my/enable-prettier-on-save)
+  :config
+  (add-to-list 'treesit-language-source-alist '(javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src"))
+  (add-to-list 'treesit-language-source-alist '(jsdoc "https://github.com/tree-sitter/tree-sitter-jsdoc" "master" "src"))
   :mode "\\.js\\'")
 
 (use-package tsx-ts-mode
@@ -368,6 +360,8 @@
   :hook (tsx-ts-mode . my/enable-prettier-on-save)
   :custom
   (tab-width 4)
+  :config
+  (add-to-list 'treesit-language-source-alist '(tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src"))
   :mode "\\.tsx\\'")
 
 (use-package typescript-ts-mode
@@ -375,6 +369,8 @@
   :hook (typescript-ts-mode . my/enable-prettier-on-save)
   :custom
   (typescript-ts-mode-indent-offset 4)
+  :config
+  (add-to-list 'treesit-language-source-alist '(typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src"))
   :mode "\\.ts\\'")
 
 (use-package html-ts-mode
@@ -414,20 +410,20 @@
 
 
 ;;; External Packages
-(use-package doric-themes
-  :ensure t
-  :demand t
-  :config
-  ;; These are the default values.
-  (setq doric-themes-to-toggle '(doric-earth doric-fire))
-  (setq doric-themes-to-rotate doric-themes-collection)
+;; (use-package doric-themes
+;;   :ensure t
+;;   :demand t
+;;   :config
+;;   ;; These are the default values.
+;;   (setq doric-themes-to-toggle '(doric-earth doric-fire))
+;;   (setq doric-themes-to-rotate doric-themes-collection)
 
-  (doric-themes-select 'doric-fire)
+;;   (doric-themes-select 'doric-fire)
 
-  :bind
-  (("<f5>" . doric-themes-toggle)
-   ("C-<f5>" . doric-themes-select)
-   ("M-<f5>" . doric-themes-rotate)))
+;;   :bind
+;;   (("<f5>" . doric-themes-toggle)
+;;    ("C-<f5>" . doric-themes-select)
+;;    ("M-<f5>" . doric-themes-rotate)))
 
 (use-package corfu
   :ensure t
@@ -453,6 +449,21 @@
 (use-package nix-mode
   :ensure t
   :mode "\\.nix\\'")
+
+(use-package conf-mode
+  :ensure nil
+  :mode ("\\.env\\..*\\'" "\\.env\\'")
+  :init
+  (add-to-list 'auto-mode-alist '("\\.env\\'" . conf-mode)))
+
+(use-package nov
+  :ensure t
+  :mode ("\\.epub\\'" . nov-mode)
+  :hook ((nov-mode . visual-line-mode)
+         (nov-mode . visual-fill-column-mode))
+  :config
+  (setq nov-text-width 80
+        visual-fill-column-center-text t))
 
 ;; (use-package magit
 ;;   :ensure t
@@ -489,4 +500,8 @@
                         smtpmail-stream-type 'starttls
                         smtpmail-smtp-user "kerimcanbalkan@gmail.com"
                         smtpmail-auth-credentials "~/.authinfo.gpg"))
+
+;; Load elegance look
+(load (expand-file-name "elegance/sanity.el" user-emacs-directory))
+(load (expand-file-name "elegance/elegance.el" user-emacs-directory))
 ;;; init.el ends here
