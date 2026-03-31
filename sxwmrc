@@ -13,7 +13,7 @@ move_window_amount      : 50
 resize_window_amount    : 50
 snap_distance           : 5
 motion_throttle         : 60 # Set to screen refresh rate for smoothest motions
-should_float            : "pcmanfm", "obs"
+should_float            : "pcmanfm", "obs", "xfce4-notifyd", "xfce4-screenshooter"
 new_win_focus           : true
 warp_cursor             : true
 floating_on_top         : true
@@ -30,17 +30,22 @@ mod_key : super
 # Application Launchers:
 bind : mod + Return : "kitty"
 bind : mod + b : "chromium"
-bind : mod + p : "dmenu_run -fn 'Aporetic Sans Mono-13'"
+bind : mod + p : "dmenu_run -fn 'Aporetic Sans Mono-13' -nb '#ffffff' -nf '#333333' -sf '#ffffff' -sb '#333333' -i"
 bind : mod + e : "emacsclient -c"
-bind : mod + w : "/home/kerim/scripts/wallpaper-seletor.sh"
+bind : mod + w : "/home/kerim/scripts/wallpaper-selector.sh"
+bind : mod + shift + p : "/home/kerim/scripts/passmenu.sh"
 
 # Manage Volume
-bind : XF86AudioMute : "pactl set-sink-mute @DEFAULT_SINK@ toggle"
+bind : XF86AudioMute : "pactl set-sink-mute @DEFAULT_SINK@ toggle && "
 bind : XF86AudioRaiseVolume : "pactl set-sink-volume @DEFAULT_SINK@ +5%"
 bind : XF86AudioLowerVolume : "pactl set-sink-volume @DEFAULT_SINK@ -5%"
 
-# Show Current Volume (optional)
-bind : XF86AudioMedia : "pactl get-sink-volume @DEFAULT_SINK@"
+# Manage Screen Brightness
+bind : XF86MonBrightnessUp : "brightnessctl set +5%"
+bind : XF86MonBrightnessDown : "brightnessctl set 5%-"
+
+# Screenshots
+bind: mod + s: "xfce4-screenshooter"
 
 # Window Management:
 call : mod + q : close_window
@@ -132,8 +137,10 @@ workspace : mod + 9          : move 9
 workspace : mod + shift + 9  : swap 9
 
 exec : "xset r rate 170 90"
+exec:  "setxkbmap -layout us,tr -option grp:alt_space_toggle"
 exec : "emacs --daemon"
-exec : "autorandr -c"
-exec : "xwallpaper --daemon --stretch /home/kerim/Pictures/Wallpapers/gnu.jpg"
-exec : "redshift -O 3500"
 exec : "sxbar"
+exec : "light-locker"
+exec : "autorandr -c"
+exec : "redshift -O 3500"
+exec : "xwallpaper --daemon --stretch /home/kerim/Pictures/Wallpapers/gnu.jpg"

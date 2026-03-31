@@ -100,3 +100,5 @@
 ;; (setq warning-suppress-types '((lexical-binding)))
 
 ;; (setq package-enable-at-startup t)
+
+(setq inhibit-startup-screen nil)

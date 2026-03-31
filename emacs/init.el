@@ -27,8 +27,9 @@
   (delete-selection-mode 1)                       ;; Enable replacing selected text with typed text.
   (global-auto-revert-non-file-buffers t)         ;; Automatically refresh non-file buffers.
   (history-length 25)                             ;; Set the length of the command history.
+  (inhibit-splash-screen nil)
+  (inhibit-startup-screen nil)
   (indent-tabs-mode nil)                          ;; Disable the use of tabs for indentation (use spaces instead).
-  (inhibit-startup-message t)                     ;; Disable the startup message when Emacs launches.
   (initial-scratch-message "")                    ;; Clear the initial message in the *scratch* buffer.
   (ispell-dictionary "en_US")                     ;; Set the default dictionary for spell checking.
   (make-backup-files nil)                         ;; Disable creation of backup files.
@@ -69,16 +70,21 @@
    ("<f5>" . my/toggle-theme)
    ("C-c l" . org-store-link)
    ("C-c a" . org-agenda)
-   ("C-c l" . org-capture))
+   ("C-c c" . org-capture))
   :config
   ;; Set Font
   ;; (set-face-attribute 'default nil :family "Aporetic Sans Mono"  :height 120)
 
   ;; Set theme
+  ;; Theme is managed by elegant.el
   ;; (load-theme 'modus-operandi)
 
   ;; Transparency
   ;;(add-to-list 'default-frame-alist '(alpha-background . 90))
+
+  (defun custom/kill-this-buffer ()
+    (interactive) (kill-buffer (current-buffer)))
+  (global-set-key (kbd "C-x k") 'custom/kill-this-buffer)
 
   ;; Save manual customizations to a separate file instead of cluttering init.el
   (setq custom-file (locate-user-emacs-file "custom-vars.el")) ;; Specify the custom file path.
@@ -93,6 +99,7 @@
   :init                        ;; Initialization settings that apply before the package is loaded.
   (tool-bar-mode -1)           ;; Disable the tool bar for a cleaner interface.
   (menu-bar-mode -1)           ;; Disable the menu bar for a more streamlined look.
+  (tooltip-mode -1)
 
   (when scroll-bar-mode
     (scroll-bar-mode -1))      ;; Disable the scroll bar if it is active.
@@ -105,33 +112,25 @@
   (file-name-shadow-mode 1)    ;; Enable shadowing of filenames for clarity.
 
   ;; Set the default coding system for files to UTF-8.
-  (modify-coding-system-alist 'file "" 'utf-8)
-
-  ;; Add a hook to run code after Emacs has fully initialized.
-  (add-hook 'after-init-hook
-            (lambda ()
-              (message "Emacs has fully loaded. This code runs after startup.")
-
-              ;; Insert a welcome message in the *scratch* buffer displaying loading time and activated packages.
-              (with-current-buffer (get-buffer-create "*scratch*")
-                (insert (format
-                         ";;    Welcome to Emacs!
-;;
-;;    Loading time : %s
-"
-                         (emacs-init-time)
-                         ))))))
+  (modify-coding-system-alist 'file "" 'utf-8))
 
 (use-package window
   :ensure nil
   :custom
   (display-buffer-alist
    '(
-     ("\\*\\(Backtrace\\|Warnings\\|Compile-Log\\|[Hh]elp\\|Messages\\|Bookmark List\\|Ibuffer\\|Occur\\|eldoc.*\\)\\*"
+     ("\\*\\(Backtrace\\|Warnings\\|Compile-Log\\|[Hh]elp\\|Messages\\|Bookmark List\\|Ibuffer\\|Occur\\)\\*"
       (display-buffer-in-side-window)
       (window-height . 0.25)
       (side . bottom)
       (slot . 0))
+
+     ("\\*\\(eldoc.*\\)\\*"
+      (display-buffer-in-side-window)
+      (window-height . 0.25)
+      (side . bottom)
+      (slot . 0)
+      (select . t))
 
      ("\\*\\(lsp-help\\)\\*"
       (display-buffer-in-side-window)
@@ -162,13 +161,12 @@
 
 (use-package eldoc
   :ensure nil
-  :custom
-  (eldoc-help-at-pt t)
-  (eldoc-echo-area-use-multiline-p nil)
-  (eldoc-echo-area-prefer-doc-buffer t)
-  (eldoc-documentation-strategy 'eldoc-documentation-compose)
   :init
-  (global-eldoc-mode))
+  (global-eldoc-mode)
+  :custom
+  (eldoc-idle-delay 0.2)
+  (eldoc-echo-area-use-multiline-p t)
+  (eldoc-documentation-strategy #'eldoc-documentation-compose))
 
 (use-package isearch
   :ensure nil
@@ -186,7 +184,7 @@
   :hook (prog-mode . flymake-mode)
   :bind (:map flymake-mode-map
               ("M-n" . flymake-goto-next-error)
-              ("M-p" . flymake-goto-next-error))
+              ("M-p" . flymake-goto-prev-error))
   :custom
   (flymake-indicator-type 'margins)
   (flymake-margin-indicators-string
@@ -231,21 +229,25 @@
   (org-agenda-files
    '("~/Documents/Org/tasks.org"
      "~/Documents/Org/projects.org"
-     "~/Documents/Org/notes.org"))
+     "~/Documents/Org/notes.org"
+     "~/Documents/Org/events.org"))
   (org-default-notes-file "~/Documents/Org/notes.org")
   (org-capture-templates
    '(("t" "New Task" entry
       (file+headline "~/Documents/Org/tasks.org" "Inbox")
-      "* TODO %?\n  Created: %U\n")
+      "* TODO %?\nCreated: %U\n")
 
      ("n" "Note" entry
       (file+headline "~/Documents/Org/notes.org" "Notes")
-      "* %?\n  Created: %U\n")
+      "* %?\nCreated: %U\n")
 
      ("p" "Project Idea" entry
       (file+headline "~/Documents/Org/projects.org" "Ideas")
-      "* %?\n  Created: %U\n")
-     )))
+      "* %?\nCreated: %U\n")
+
+     ("e" "Event" entry
+      (file+headline "~/Documents/Org/events.org" "Events")
+      "* %?\n%^{When}t\n"))))
 
 (use-package icomplete
   :bind (:map icomplete-minibuffer-map
@@ -272,12 +274,20 @@
 ;; Setup lsp
 (use-package eglot
   :ensure nil
+  :preface
+  (defun mp-eglot-eldoc ()
+    (setq eldoc-documentation-strategy
+          'eldoc-documentation-compose-eagerly))
   :hook ((c-mode c++-mode
                  go-ts-mode go-mode
                  web-mode js-ts-mode
+                 typescript-ts-mode
+                 html-ts-mode
+                 css-ts-mode
                  tsx-ts-mode
                  lua-mode)
          . eglot-ensure)
+  ((eglot-managed-mode . mp-eglot-eldoc))
   :init
   (with-eval-after-load 'eglot
     (add-to-list
@@ -298,7 +308,7 @@
          ("C-c l i" . eglot-inlay-hints-mode)
          ("C-c l f" . eglot-format-buffer))
   :config
-  (add-hook 'before-save-hook 'eglot-format-buffer t t)
+  (add-hook 'before-save-hook 'eglot-format-buffer nil t)
   (setq-default eglot-workspace-configuration
                 '((:tailwindCSS
                    (:includeLanguages
@@ -307,7 +317,7 @@
                                       :javascript "html"
                                       :javascriptreact "html")))))
   (setq-default eglot-workspace-configuration (quote
-                                               (:gopls (:hints (:parameterNames t)))))
+                                               (:gopls (:hints (:parameterNames nil)))))
   (setq eglot-ignored-server-capabilities '( :documentHighlightProvider))
   (setf (plist-get eglot-events-buffer-config :size) 0)
   (add-to-list 'eglot-server-programs
@@ -338,11 +348,12 @@
 (use-package go-ts-mode
   :mode "\\.go\\'"
   :ensure nil
-  :hook (go-ts-mode . my/go-setup)
+  :hook ((go-ts-mode . my/go-setup)
+         (go-ts-mode . gofumpt-format-on-save-mode)
+         (go-ts-mode . goimports-format-on-save-mode))
   :config
   (defun my/go-setup ()
     "Set Go indentation"
-    ;; Use tabs for Go, standard Go tab width
     (setq-local indent-tabs-mode t)
     (setq-local tab-width 8)))
 
@@ -425,6 +436,28 @@
 ;;    ("C-<f5>" . doric-themes-select)
 ;;    ("M-<f5>" . doric-themes-rotate)))
 
+(use-package reformatter
+  :ensure t
+  :config
+  (reformatter-define gofumpt-format
+    :program "gofumpt"
+    :args '()
+    :lighter " Gofumpt")
+  (reformatter-define goimports-format
+    :program "goimports"
+    :args '()
+    :lighter " GoImp"))
+
+(use-package multiple-cursors
+  :ensure t
+  :config
+  (global-set-key (kbd "C-c e") 'mc/edit-lines)
+  (global-set-key (kbd "C-c m w") 'mc/mark-next-like-this-word)
+  (global-set-key (kbd "C-c m t") 'mc/mark-next-like-this))
+
+(use-package standard-themes
+  :ensure t)
+
 (use-package corfu
   :ensure t
   :custom
@@ -434,7 +467,7 @@
   (corfu-echo-documentation 0.5)
   (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
   (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
-  (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
+  (corfu-quit-no-match t)      ;; Never quit, even if there is no match
   (corfu-preview-current nil)    ;; Disable current candidate preview
   (corfu-preselect 'prompt)      ;; Preselect the prompt
   (corfu-on-exact-match 'insert) ;; Configure handling of exact matches
@@ -465,9 +498,9 @@
   (setq nov-text-width 80
         visual-fill-column-center-text t))
 
-;; (use-package magit
-;;   :ensure t
-;;   :defer t)
+(use-package magit
+  :ensure t
+  :defer t)
 
 ;; Email setup
 (use-package mu4e

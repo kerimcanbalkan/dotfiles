@@ -1,20 +1,3 @@
-(defvar my-light-theme 'modus-operandi
-  "The light theme to be used in toggle.")
-
-(defvar my-dark-theme 'modus-vivendi
-  "The dark theme to be used in toggle.")
-
-(defun my/toggle-theme ()
-  "Toggle between my preferred light and dark themes."
-  (interactive)
-  (if (equal (car custom-enabled-themes) my-light-theme)
-      (progn
-        (disable-theme my-light-theme)
-        (load-theme my-dark-theme t))
-    (progn
-      (disable-theme my-dark-theme)
-      (load-theme my-light-theme t))))
-
 ;; Format with prettier
 (defun my/find-local-prettier ()
   "Return path to local prettier or nil."
