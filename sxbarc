@@ -8,7 +8,7 @@ border              : false
 border_width        : 0
 background_colour   : #fffff
 foreground_colour   : #333
-border_colour       : #fffff
+border_colour       : #333
 font                : Aporetic Sans Mono
 font_size           : 18
 

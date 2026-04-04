@@ -114,50 +114,41 @@
   ;; Set the default coding system for files to UTF-8.
   (modify-coding-system-alist 'file "" 'utf-8))
 
+(defun my-select-window (window)
+        (select-window window))
+
 (use-package window
   :ensure nil
   :custom
   (display-buffer-alist
-   '(
-     ("\\*\\(Backtrace\\|Warnings\\|Compile-Log\\|[Hh]elp\\|Messages\\|Bookmark List\\|Ibuffer\\|Occur\\)\\*"
-      (display-buffer-in-side-window)
-      (window-height . 0.25)
-      (side . bottom)
-      (slot . 0))
-
-     ("\\*\\(eldoc.*\\)\\*"
+   '(("\\*\\(Backtrace\\|Warnings\\|Compile-Log\\|Messages\\|Bookmark List\\|Occur\\|eldoc\\)\\*"
       (display-buffer-in-side-window)
       (window-height . 0.25)
       (side . bottom)
       (slot . 0)
-      (select . t))
-
-     ("\\*\\(lsp-help\\)\\*"
+      (body-function . my-select-window))
+     ("\\*\\([Hh]elp\\)\\*"
       (display-buffer-in-side-window)
-      (window-height . 0.25)
-      (side . bottom)
-      (slot . 0))
-
-     ;; Configuration for displaying various diagnostic buffers on
-     ;; bottom 25%:
-     ("\\*\\(Flymake diagnostics\\|xref\\|ivy\\|Swiper\\|Completions\\)"
+      (window-width . 75)
+      (side . right)
+      (slot . 0)
+      (body-function . my-select-window))
+     ("\\*\\(Ibuffer\\)\\*"
       (display-buffer-in-side-window)
-      (window-height . 0.25)
-      (side . bottom)
+      (window-width . 100)
+      (side . right)
       (slot . 1))
-     )))
-
-(use-package man
-  :ensure nil
-  :hook (Man-mode . (lambda ()
-                      (setq Man-notify-method 'pushy)))
-  :config
-  (setq display-buffer-alist
-        '(("\\*Man.*\\*"
-           (display-buffer-reuse-window display-buffer-in-side-window)
-           (side . right)
-           (window-width . 0.5)
-           (slot . 0)))))
+     ("\\*\\(Flymake diagnostics\\|Completions\\)"
+      (display-buffer-in-side-window)
+      (window-height . 0.25)
+      (side . bottom)
+      (slot . 2)
+      (body-function . my-select-window))
+     ("\\*\\(grep\\|xref\\|find\\)\\*"
+      (display-buffer-in-side-window)
+      (window-height . 0.25)
+      (side . bottom)
+      (slot . 1)))))
 
 (use-package eldoc
   :ensure nil
@@ -167,6 +158,13 @@
   (eldoc-idle-delay 0.2)
   (eldoc-echo-area-use-multiline-p t)
   (eldoc-documentation-strategy #'eldoc-documentation-compose))
+
+;;; │ MAN
+(use-package man
+  :ensure nil
+  :commands (man)
+  :config
+  (setq Man-notify-method 'pushy))
 
 (use-package isearch
   :ensure nil
@@ -399,9 +397,9 @@
   :ensure nil
   :custom
   (newsticker-retrieval-interval 0) ;; Only fetches when first opening (avoids unwanted fetching/ui locking while doing other things later)
-  (newsticker-treeview-treewindow-width 40)
   (newsticker-dir (expand-file-name "cache/newsticker/" user-emacs-directory))
   (newsticker-retrieval-method (if (executable-find "wget") 'extern 'intern))
+  (newsticker-treeview-listwindow-visible nil)
   (newsticker-wget-arguments
    '("--quiet"
      "--no-hsts"
@@ -409,12 +407,12 @@
      "--append-output=/dev/null"))
   :config
   (setq newsticker-url-list
-        '(("Null Program" "http://nullprogram.com/feed/" nil 3600)
-          ("Protesilaos" "https://protesilaos.com/master.xml" nil 3600)
+        '(("Protesilaos" "https://protesilaos.com/master.xml" nil 3600)
           ("Evrensel" "https://www.evrensel.net/rss/haber.xml" nil 3600)
           ("Joshua Blais" "https://joshblais.com/index.xml" nil 3600)
           ("Richard Stallman" "https://stallman.org/rss/rss.xml" nil 3600)
           ("Jacobin" "https://jacobin.com/feed" nil 3600)
+          ("Sasha Chua" "https://sachachua.com/blog/feed/index.xml" nil 3600)
           ("Rahul M. Juliato" "https://www.rahuljuliato.com/rss.xml" nil 3600)
           ("Emacs Life" "https://planet.emacslife.com/atom.xml" nil 3600))))
 
@@ -435,6 +433,14 @@
 ;;   (("<f5>" . doric-themes-toggle)
 ;;    ("C-<f5>" . doric-themes-select)
 ;;    ("M-<f5>" . doric-themes-rotate)))
+
+;; Fix Emacs's weird undo mechanism
+(use-package undo-fu
+  :ensure t)
+(use-package undo-fu-session
+  :ensure t
+  :config
+  (undo-fu-session-global-mode))
 
 (use-package reformatter
   :ensure t
