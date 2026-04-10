@@ -57,7 +57,12 @@
                      user-full-name "Kerimcan Balkan")
   (read-extended-command-predicate #'command-completion-default-include-p)
   (text-mode-ispell-word-completion nil)
-    :hook                                           ;; Add hooks to enable specific features in certain modes.
+  (redisplay-skip-fontification-on-input t)       ;; Disable fontification while typing
+  (cursor-in-non-selected-windows nil)
+  (highlight-nonselected-windows nil)
+  (save-interprogram-paste-before-kill t)
+  (kill-do-not-save-duplicates t)
+  :hook                                           ;; Add hooks to enable specific features in certain modes.
   (prog-mode . display-line-numbers-mode)         ;; Enable line numbers in programming modes.
   (doc-view-mode-hook . save-place-mode)
   (doc-view-mode-hook . auto-revert--mode)
@@ -81,6 +86,15 @@
 
   ;; Transparency
   ;;(add-to-list 'default-frame-alist '(alpha-background . 90))
+
+  ;; Disable bidirectional text scanning
+  (setq-default bidi-display-reordering 'left-to-right
+                bidi-paragraph-direction 'left-to-right)
+  (setq bidi-inhibit-bpa t)
+
+  ;; Increase process output buffer for lsp performance
+  (setq read-process-output-max (* 4 1024 1024)) ; 4MB
+
 
   (defun custom/kill-this-buffer ()
     (interactive) (kill-buffer (current-buffer)))
@@ -273,9 +287,6 @@
 (use-package eglot
   :ensure nil
   :preface
-  (defun mp-eglot-eldoc ()
-    (setq eldoc-documentation-strategy
-          'eldoc-documentation-compose-eagerly))
   :hook ((c-mode c++-mode
                  go-ts-mode go-mode
                  web-mode js-ts-mode
@@ -285,8 +296,7 @@
                  tsx-ts-mode
                  lua-mode)
          . eglot-ensure)
-  ((eglot-managed-mode . mp-eglot-eldoc))
-  :init
+    :init
   (with-eval-after-load 'eglot
     (add-to-list
      'eglot-server-programs
@@ -314,8 +324,6 @@
                                       :typescript "html"
                                       :javascript "html"
                                       :javascriptreact "html")))))
-  (setq-default eglot-workspace-configuration (quote
-                                               (:gopls (:hints (:parameterNames nil)))))
   (setq eglot-ignored-server-capabilities '( :documentHighlightProvider))
   (setf (plist-get eglot-events-buffer-config :size) 0)
   (add-to-list 'eglot-server-programs
@@ -452,8 +460,10 @@
   (reformatter-define goimports-format
     :program "goimports"
     :args '()
-    :lighter " GoImp"))
+    :lighter " Gimp"))
 
+
+;; Editing
 (use-package multiple-cursors
   :ensure t
   :config
@@ -461,8 +471,14 @@
   (global-set-key (kbd "C-c m w") 'mc/mark-next-like-this-word)
   (global-set-key (kbd "C-c m t") 'mc/mark-next-like-this))
 
-(use-package standard-themes
-  :ensure t)
+(use-package avy
+  :ensure t
+  :config
+  (global-set-key (kbd "C-c C-j") 'avy-resume)
+  (global-set-key (kbd "M-g e") 'avy-goto-word-0)
+  (global-set-key (kbd "M-g w") 'avy-goto-word-1)
+  (global-set-key (kbd "M-g f") 'avy-goto-line)
+  (global-set-key (kbd "C-'") 'avy-goto-char-2))
 
 (use-package corfu
   :ensure t
@@ -485,9 +501,14 @@
   (corfu-history-mode)
   (corfu-popupinfo-mode))
 
-(use-package nix-mode
+;; (use-package nix-mode
+;;   :ensure t
+;;   :mode "\\.nix\\'")
+
+(use-package diff-hl
   :ensure t
-  :mode "\\.nix\\'")
+  :config
+  (global-diff-hl-mode))
 
 (use-package conf-mode
   :ensure nil
@@ -541,6 +562,5 @@
                         smtpmail-auth-credentials "~/.authinfo.gpg"))
 
 ;; Load elegance look
-(load (expand-file-name "elegance/sanity.el" user-emacs-directory))
 (load (expand-file-name "elegance/elegance.el" user-emacs-directory))
 ;;; init.el ends here
