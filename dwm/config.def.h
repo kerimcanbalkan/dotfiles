@@ -5,12 +5,12 @@ static const unsigned int borderpx  = 1;        /* border pixel of windows */
 static const unsigned int gappx     = 5;       /* gap pixel between windows */
 static const unsigned int snap      = 32;       /* snap pixel */
 static const int showbar            = 1;        /* 0 means no bar */
-static const int topbar             = 0;        /* 0 means bottom bar */
+static const int topbar             = 1;        /* 0 means bottom bar */
 static const char *fonts[]          = { "Aporetic Sans Mono:size=13" };
 static const char dmenufont[]       = "Aporetic Sans Mono:size=13";
 static const char col_gray1[] = "#c5c1c2";
 static const char col_gray2[] = "#a9a9a9";
-static const char col_gray3[] = "#2e3436";
+static const char col_gray3[] = "#383838";
 static const char col_gray4[] = "#ffffff";
 static const char col_cyan[]  = "#02037c";
 static const char *colors[][3]      = {
@@ -23,14 +23,25 @@ static const char *colors[][3]      = {
 static const char *tags[] = { "1", "2", "3", "4", "5", "6" };
 
 static const Rule rules[] = {
-    /* xprop(1):
-     *	WM_CLASS(STRING) = instance, class
-     *	WM_NAME(STRING) = title
-     */
-    /* class      instance    title       tags mask     isfloating   monitor */
-    { "Gimp",     NULL,       NULL,       0,            1,           -1 },
-    { "Firefox",  NULL,       NULL,       1 << 8,       0,           -1 },
-    { "Chromium", NULL,       NULL,       2,       0,           -1 },
+    /* class           instance  title  tags mask   isfloating  monitor */
+
+    /* Emacs */
+    { "Emacs",         NULL,     NULL,  1 << 0,     0,          -1 },
+
+    /* Browsers (workspace 2) */
+    { "Firefox",       NULL,     NULL,  1 << 1,     0,          -1 },
+    { "Chromium",      NULL,     NULL,  1 << 1,     0,          -1 },
+    { "qutebrowser",   NULL,     NULL,  1 << 1,     0,          -1 },
+
+    /* Terminals (workspace 3) */
+    { "Alacritty",     NULL,     NULL,  1 << 2,     0,          -1 },
+    { "XTerm",         NULL,     NULL,  1 << 2,     0,          -1 },
+
+    /* Signal (workspace 6) */
+    { "Signal",        NULL,     NULL,  1 << 5,     0,          -1 },
+
+    /* Optional: Gimp floating */
+    { "Gimp",          NULL,     NULL,  0,          1,          -1 },
 };
 
 /* layout(s) */

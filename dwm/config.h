@@ -8,28 +8,40 @@ static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
 static const char *fonts[]          = { "Aporetic Sans Mono:size=13" };
 static const char dmenufont[]       = "Aporetic Sans Mono:size=13";
-static const char col_gray1[]       = "#ffffff";
-static const char col_gray2[]       = "#333333";
-static const char col_gray3[]       = "#333333";
-static const char col_gray4[]       = "#ffffff";
-static const char col_cyan[]        = "#333333";
+static const char col_gray1[] = "#c5c1c2";
+static const char col_gray2[] = "#a9a9a9";
+static const char col_gray3[] = "#383838";
+static const char col_gray4[] = "#ffffff";
+static const char col_cyan[]  = "#02037c";
 static const char *colors[][3]      = {
-    /*               fg         bg         border   */
-    [SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
-    [SchemeSel]  = { col_gray4, col_cyan, col_cyan },
+  /*               fg         bg         border   */
+  [SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
+  [SchemeSel]  = { col_gray4, col_cyan, col_cyan },
 };
 
 /* tagging */
 static const char *tags[] = { "1", "2", "3", "4", "5", "6" };
 
 static const Rule rules[] = {
-    /* xprop(1):
-     *	WM_CLASS(STRING) = instance, class
-     *	WM_NAME(STRING) = title
-     */
-    /* class      instance    title       tags mask     isfloating   monitor */
-    { "Gimp",     NULL,       NULL,       0,            1,           -1 },
-    { "Firefox",  NULL,       NULL,       1 << 8,       0,           -1 },
+    /* class           instance  title  tags mask   isfloating  monitor */
+
+    /* Emacs */
+    { "Emacs",         NULL,     NULL,  1 << 0,     0,          -1 },
+
+    /* Browsers (workspace 2) */
+    { "Firefox",       NULL,     NULL,  1 << 1,     0,          -1 },
+    { "Chromium",      NULL,     NULL,  1 << 1,     0,          -1 },
+    { "qutebrowser",   NULL,     NULL,  1 << 1,     0,          -1 },
+
+    /* Terminals (workspace 3) */
+    { "Alacritty",     NULL,     NULL,  1 << 2,     0,          -1 },
+    { "XTerm",         NULL,     NULL,  1 << 2,     0,          -1 },
+
+    /* Signal (workspace 6) */
+    { "Signal",        NULL,     NULL,  1 << 5,     0,          -1 },
+
+    /* Optional: Gimp floating */
+    { "Gimp",          NULL,     NULL,  0,          1,          -1 },
 };
 
 /* layout(s) */
@@ -64,6 +76,9 @@ static const char *termcmd[]  = { "alacritty", NULL };
 static const char *emacscmd[] = {
   "emacsclient", "-c", "-n", "-a", "", NULL
 };
+static const char *colorpickercmd[] = { "/home/kerim/scripts/color-picker.sh", NULL };
+static const char *wallpaperselectorcmd[] = { "/home/kerim/scripts/wallpaper-selector.sh", NULL };
+static const char *passmenucmd[] = { "/home/kerim/scripts/passmenu.sh", NULL };
 static const char *upbrightness[]   = { "brightnessctl", "set", "+5%", NULL };
 static const char *downbrightness[] = { "brightnessctl", "set", "5%-", NULL };
 static const char *volumeUp[] = {"pactl", "set-sink-volume", "@DEFAULT_SINK@", "+5%", NULL};
@@ -74,6 +89,9 @@ static const Key keys[] = {
     /* modifier                     key        function        argument */
     { MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
     { MODKEY,                       XK_Return, spawn,          {.v = termcmd } },
+    { MODKEY,                       XK_w,      spawn,          {.v = wallpaperselectorcmd } },
+    { MODKEY|ShiftMask,             XK_p,      spawn,          {.v = passmenucmd } },
+    { MODKEY,                       XK_c,      spawn,          {.v = colorpickercmd } },
     { MODKEY,						XK_e,      spawn,          {.v = emacscmd } },
     { MODKEY,                       XK_b,      togglebar,      {0} },
     { MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
