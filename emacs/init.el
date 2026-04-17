@@ -376,7 +376,7 @@
   :ensure nil
   :hook (tsx-ts-mode . my/enable-prettier-on-save)
   :custom
-  (tab-width 4)
+  (tab-width 2)
   :config
   (add-to-list 'treesit-language-source-alist '(tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src"))
   :mode "\\.tsx\\'")
@@ -385,7 +385,7 @@
   :ensure nil
   :hook (typescript-ts-mode . my/enable-prettier-on-save)
   :custom
-  (typescript-ts-mode-indent-offset 4)
+  (typescript-ts-mode-indent-offset 2)
   :config
   (add-to-list 'treesit-language-source-alist '(typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src"))
   :mode "\\.ts\\'")
@@ -420,27 +420,48 @@
           ("Joshua Blais" "https://joshblais.com/index.xml" nil 3600)
           ("Richard Stallman" "https://stallman.org/rss/rss.xml" nil 3600)
           ("Jacobin" "https://jacobin.com/feed" nil 3600)
+          ("Andrew Tropin" "https://trop.in/feed/blog.xml" nil 3600)
+          ("Mihaiol Tenau" "https://mihaiolteanu.me/rss.xml" nil 3600)
           ("Sasha Chua" "https://sachachua.com/blog/feed/index.xml" nil 3600)
           ("Rahul M. Juliato" "https://www.rahuljuliato.com/rss.xml" nil 3600)
           ("Emacs Life" "https://planet.emacslife.com/atom.xml" nil 3600))))
 
-
+(use-package tab-bar
+  :ensure nil
+  :hook (after-init . tab-bar-mode)
+  :custom
+  (tab-bar-show nil))
 
 ;;; External Packages
-;; (use-package doric-themes
-;;   :ensure t
-;;   :demand t
-;;   :config
-;;   ;; These are the default values.
-;;   (setq doric-themes-to-toggle '(doric-earth doric-fire))
-;;   (setq doric-themes-to-rotate doric-themes-collection)
 
-;;   (doric-themes-select 'doric-fire)
+;; Note Taking
+(use-package denote
+  :ensure t
+  :hook (dired-mode . denote-dired-mode)
+  :bind
+  (("C-c n n" . denote)
+   ("C-c n r" . denote-rename-file)
+   ("C-c n l" . denote-link)
+   ("C-c n b" . denote-backlinks)
+   ("C-c n d" . denote-dired)
+   ("C-c n g" . denote-grep))
+  :config
+  (setq denote-directory (expand-file-name "~/Documents/Notes/"))
+  (denote-rename-buffer-mode 1))
 
-;;   :bind
-;;   (("<f5>" . doric-themes-toggle)
-;;    ("C-<f5>" . doric-themes-select)
-;;    ("M-<f5>" . doric-themes-rotate)))
+;; A collection of ridiculously useful extensions
+(use-package crux
+  :ensure t
+  :config
+  (global-set-key [remap move-beginning-of-line] #'crux-move-beginning-of-line)
+  (global-set-key (kbd "C-c o") #'crux-open-with)
+  (global-set-key (kbd "C-c e") #'crux-duplicate-current-line-or-region)
+  (global-set-key (kbd "C-c s") #'crux-sudo-edit)
+  (global-set-key (kbd "C-c d t") #'crux-insert-date)
+  (global-set-key [(shift return)] #'crux-smart-open-line)
+  (global-set-key (kbd "s-r") #'crux-recentf-ido-find-file)
+  (global-set-key (kbd "C-<backspace>") #'crux-kill-line-backwards)
+  (global-set-key [remap kill-whole-line] #'crux-kill-whole-line))
 
 ;; Fix Emacs's weird undo mechanism
 (use-package undo-fu
@@ -467,7 +488,7 @@
 (use-package multiple-cursors
   :ensure t
   :config
-  (global-set-key (kbd "C-c e") 'mc/edit-lines)
+  (global-set-key (kbd "C-c m e") 'mc/edit-lines)
   (global-set-key (kbd "C-c m w") 'mc/mark-next-like-this-word)
   (global-set-key (kbd "C-c m t") 'mc/mark-next-like-this))
 
@@ -509,6 +530,12 @@
   :ensure t
   :config
   (global-diff-hl-mode))
+
+;; Display colorcodes colors on buffers
+(use-package rainbow-mode
+  :ensure t
+  :config
+  (rainbow-mode))
 
 (use-package conf-mode
   :ensure nil
