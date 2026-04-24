@@ -1,3 +1,14 @@
+;;; kerim.el --- Kerim's Emacs --- My custom functions -*- lexical-binding: t; -*-
+;; Author: Kerimcan Balkan
+;; Version: 0.3.3
+;; Package-Requires: ((emacs "30.1"))
+;; License: GPL-2.0-or-later
+
+;;; Commentary:
+;; This file contains my custom functions.
+
+;;; Code:
+
 ;; Format with prettier
 (defun my/find-local-prettier ()
   "Return path to local prettier or nil."
@@ -23,6 +34,7 @@
       (goto-char point))))
 
 (defun my/enable-prettier-on-save ()
+  "Enable Javascript formatter prettier on save."
   (when (and (buffer-file-name)
              (my/find-local-prettier))
     (add-hook 'before-save-hook #'my/prettier-format-buffer nil t)))
@@ -39,3 +51,36 @@
     (delete-other-windows)))
 
 (global-set-key (kbd "C-x 1") #'toggle-delete-other-windows)
+
+(defun my/eval-last-sexp-as-comment ()
+  "Evaluate last sexp and insert result as a commented OUTPUT line."
+  (interactive)
+  (let ((result (eval (preceding-sexp))))
+    (end-of-line)
+    (newline)
+    (insert (format ";; %S" result))))
+
+;; Bind it in lisp-interaction-mode
+(with-eval-after-load 'lisp-mode
+  (define-key lisp-interaction-mode-map (kbd "C-j") #'my/eval-last-sexp-as-comment))
+
+(defvar my/light-theme 'tango)
+(defvar my/dark-theme 'modus-vivendi-tritanopia)
+
+(defun my/toggle-theme ()
+  "Toggle between defined dark and light themes."
+  (interactive)
+  (if (equal (car custom-enabled-themes) my/light-theme)
+      (progn
+        (disable-theme (car custom-enabled-themes))
+        (load-theme my/dark-theme t))
+    (progn
+      (disable-theme (car custom-enabled-themes))
+      (load-theme my/light-theme t))))
+
+(global-set-key (kbd "<f5>") #'my/toggle-theme)
+;; Set theme
+(load-theme my/light-theme)
+
+;; (provide kerim)
+;;; kerim.el ends here

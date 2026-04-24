@@ -5,7 +5,7 @@
 ;; License: GPL-2.0-or-later
 
 ;;; Commentary:
-;; It says this part is necessary I do not get why
+;; This is my personal GNU Emacs configuration, I mostly try to use native packages rather than relying on external ones.  An keep it as simple as possible.
 
 ;; Load my custom functions
 (load (expand-file-name "kerim.el" user-emacs-directory))
@@ -72,17 +72,14 @@
    ("C-c b k" . kill-current-buffer)
    ("C-c b" . browse-url)
    ("M-TAB" . completion-at-point)
-   ("<f5>" . my/toggle-theme)
    ("C-c l" . org-store-link)
    ("C-c a" . org-agenda)
    ("C-c c" . org-capture))
+  :init
+
   :config
   ;; Set Font
-  ;; (set-face-attribute 'default nil :family "Aporetic Sans Mono"  :height 120)
-
-  ;; Set theme
-  ;; Theme is managed by elegant.el
-  ;; (load-theme 'modus-operandi)
+  ;; (set-face-font 'default "Aporetic Sans Mono 15")
 
   ;; Transparency
   ;;(add-to-list 'default-frame-alist '(alpha-background . 90))
@@ -111,6 +108,7 @@
   (global-set-key [remap dabbrev-expand] 'hippie-expand)
 
   :init                        ;; Initialization settings that apply before the package is loaded.
+  (add-to-list 'default-frame-alist '(font . "Aporetic Sans Mono-15"))
   (tool-bar-mode -1)           ;; Disable the tool bar for a cleaner interface.
   (menu-bar-mode -1)           ;; Disable the menu bar for a more streamlined look.
   (tooltip-mode -1)
@@ -126,9 +124,19 @@
   (file-name-shadow-mode 1)    ;; Enable shadowing of filenames for clarity.
 
   ;; Set the default coding system for files to UTF-8.
-  (modify-coding-system-alist 'file "" 'utf-8))
+  (modify-coding-system-alist 'file "" 'utf-8)
+  (setq-default mode-line-format
+  '((:eval
+     (let ((branch (when vc-mode
+                     (string-trim vc-mode))))
+       (format "%s  %s%s  %d:%d"
+               (buffer-name)
+               (if branch " " "")
+               (or branch "")
+               (line-number-at-pos)
+               (current-column)))))))
 
-(defun my-select-window (window)
+  (defun my-select-window (window)
         (select-window window))
 
 (use-package window
@@ -265,8 +273,7 @@
   :bind (:map icomplete-minibuffer-map
               ("C-n" . icomplete-forward-completions)
               ("C-p" . icomplete-backward-completions)
-              ("C-v" . icomplete-vertical-toggle)
-              ("RET" . icomplete-force-complete-and-exit))
+              ("RET" . exit-minibuffer))
   :hook
   (after-init . (lambda ()
                   (fido-mode -1)
@@ -274,6 +281,7 @@
                   ))
   :config
   (setq icomplete-delay-completions-threshold 0)
+  (setq completion-auto-select nil)
   (setq icomplete-compute-delay 0)
   (setq icomplete-show-matches-on-no-input t)
   (setq icomplete-hide-common-prefix nil)
@@ -372,6 +380,11 @@
   (add-to-list 'treesit-language-source-alist '(jsdoc "https://github.com/tree-sitter/tree-sitter-jsdoc" "master" "src"))
   :mode "\\.js\\'")
 
+(use-package js-json-mode
+  :ensure nil
+  :custom
+  (tab-width 2))
+
 (use-package tsx-ts-mode
   :ensure nil
   :hook (tsx-ts-mode . my/enable-prettier-on-save)
@@ -406,17 +419,16 @@
   :custom
   (newsticker-retrieval-interval 0) ;; Only fetches when first opening (avoids unwanted fetching/ui locking while doing other things later)
   (newsticker-dir (expand-file-name "cache/newsticker/" user-emacs-directory))
-  (newsticker-retrieval-method (if (executable-find "wget") 'extern 'intern))
-  (newsticker-treeview-listwindow-visible nil)
-  (newsticker-wget-arguments
-   '("--quiet"
-     "--no-hsts"
-     "--output-document=-"
-     "--append-output=/dev/null"))
+  ;; (newsticker-retrieval-method (if (executable-find "wget") 'extern 'intern))
+  ;; (newsticker-treeview-listwindow-visible nil)
+  ;; (newsticker-wget-arguments
+  ;;  '("--quiet"
+  ;;    "--no-hsts"
+  ;;    "--output-document=-"
+  ;;    "--append-output=/dev/null"))
   :config
   (setq newsticker-url-list
         '(("Protesilaos" "https://protesilaos.com/master.xml" nil 3600)
-          ("Evrensel" "https://www.evrensel.net/rss/haber.xml" nil 3600)
           ("Joshua Blais" "https://joshblais.com/index.xml" nil 3600)
           ("Richard Stallman" "https://stallman.org/rss/rss.xml" nil 3600)
           ("Jacobin" "https://jacobin.com/feed" nil 3600)
@@ -424,6 +436,8 @@
           ("Mihaiol Tenau" "https://mihaiolteanu.me/rss.xml" nil 3600)
           ("Sasha Chua" "https://sachachua.com/blog/feed/index.xml" nil 3600)
           ("Rahul M. Juliato" "https://www.rahuljuliato.com/rss.xml" nil 3600)
+          ("Birgun" "https://www.birgun.net/rss/home" nil 3600)
+          ("Levizja Bashke" "https://levizjabashke.al/feed.xml" nil 3600)
           ("Emacs Life" "https://planet.emacslife.com/atom.xml" nil 3600))))
 
 (use-package tab-bar
@@ -587,7 +601,4 @@
                         smtpmail-stream-type 'starttls
                         smtpmail-smtp-user "kerimcanbalkan@gmail.com"
                         smtpmail-auth-credentials "~/.authinfo.gpg"))
-
-;; Load elegance look
-(load (expand-file-name "elegance/elegance.el" user-emacs-directory))
 ;;; init.el ends here

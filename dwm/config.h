@@ -8,11 +8,11 @@ static const int showbar = 1;           /* 0 means no bar */
 static const int topbar = 1;            /* 0 means bottom bar */
 static const char *fonts[] = {"Aporetic Sans Mono:size=13"};
 static const char dmenufont[] = "Aporetic Sans Mono:size=13";
-static const char col_gray1[] = "#c5c1c2";
-static const char col_gray2[] = "#a9a9a9";
-static const char col_gray3[] = "#383838";
+static const char col_gray1[] = "#ffffff";
+static const char col_gray2[] = "#231a1f";
+static const char col_gray3[] = "#18000e";
 static const char col_gray4[] = "#ffffff";
-static const char col_cyan[] = "#02037c";
+static const char col_cyan[] = "#18000e";
 static const char *colors[][3] = {
     /*               fg         bg         border   */
     [SchemeNorm] = {col_gray3, col_gray1, col_gray2},
@@ -89,11 +89,12 @@ static const char *dmenucmd[] = {
     "-nf",       col_gray3, "-sb",    col_cyan, "-sf",     col_gray4, NULL};
 static const char *termcmd[] = {"st", NULL};
 static const char *emacscmd[] = {"emacsclient", "-c", "-n", "-a", "", NULL};
-static const char *colorpickercmd[] = {"/home/kerim/scripts/color-picker.sh",
-                                       NULL};
+static const char *colorpickercmd[] = {
+    "/home/kerim/dotfiles/scripts/color-picker.sh", NULL};
 static const char *wallpaperselectorcmd[] = {
     "/home/kerim/scripts/wallpaper-selector.sh", NULL};
-static const char *passmenucmd[] = {"/home/kerim/scripts/passmenu.sh", NULL};
+static const char *passmenucmd[] = {"/home/kerim/dotfiles/scripts/passmenu.sh",
+                                    NULL};
 static const char *upbrightness[] = {"brightnessctl", "set", "+5%", NULL};
 static const char *downbrightness[] = {"brightnessctl", "set", "5%-", NULL};
 static const char *volumeUp[] = {"pactl", "set-sink-volume", "@DEFAULT_SINK@",
@@ -102,6 +103,7 @@ static const char *volumeDown[] = {"pactl", "set-sink-volume", "@DEFAULT_SINK@",
                                    "-5%", NULL};
 static const char *volumeMute[] = {"pactl", "set-sink-mute", "@DEFAULT_SINK@",
                                    "toggle", NULL};
+static const char *screenshotcmd[] = {"/home/kerim/dotfiles/capture.sh", NULL};
 
 static const Key keys[] = {
     /* modifier                     key        function        argument */
@@ -111,6 +113,7 @@ static const Key keys[] = {
     {MODKEY | ShiftMask, XK_p, spawn, {.v = passmenucmd}},
     {MODKEY, XK_c, spawn, {.v = colorpickercmd}},
     {MODKEY, XK_e, spawn, {.v = emacscmd}},
+    {MODKEY, XK_s, spawn, {.v = screenshotcmd}},
     {MODKEY, XK_b, togglebar, {0}},
     {MODKEY, XK_j, focusstack, {.i = +1}},
     {MODKEY, XK_k, focusstack, {.i = -1}},
