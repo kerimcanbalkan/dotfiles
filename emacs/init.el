@@ -92,6 +92,8 @@
   ;; Increase process output buffer for lsp performance
   (setq read-process-output-max (* 4 1024 1024)) ; 4MB
 
+  ;; Handle pinentry
+  (setq epg-pinentry-mode 'loopback)
 
   (defun custom/kill-this-buffer ()
     (interactive) (kill-buffer (current-buffer)))
@@ -312,8 +314,8 @@
        . ("rass"
           "--"
           "typescript-language-server" "--stdio"
-          "--"
-          "eslint-lsp" "--stdio"
+          ;; "--"
+          ;; "eslint-lsp" "--stdio"
           "--"
           "tailwindcss-language-server" "--stdio"))))
   :bind (:map
@@ -374,7 +376,7 @@
 
 (use-package js-ts-mode
   :ensure nil
-  :hook (js-ts-mode . my/enable-prettier-on-save)
+  :hook (js-ts-mode . prettier-format-on-save-mode)
   :config
   (add-to-list 'treesit-language-source-alist '(javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src"))
   (add-to-list 'treesit-language-source-alist '(jsdoc "https://github.com/tree-sitter/tree-sitter-jsdoc" "master" "src"))
@@ -387,7 +389,7 @@
 
 (use-package tsx-ts-mode
   :ensure nil
-  :hook (tsx-ts-mode . my/enable-prettier-on-save)
+  :hook (tsx-ts-mode . prettier-format-on-save-mode)
   :custom
   (tab-width 2)
   :config
@@ -396,7 +398,7 @@
 
 (use-package typescript-ts-mode
   :ensure nil
-  :hook (typescript-ts-mode . my/enable-prettier-on-save)
+  :hook (typescript-ts-mode . prettier-format-on-save-mode)
   :custom
   (typescript-ts-mode-indent-offset 2)
   :config
@@ -405,12 +407,12 @@
 
 (use-package html-ts-mode
   :ensure nil
-  :hook (html-ts-mode . my/enable-prettier-on-save)
+  :hook (html-ts-mode . prettier-format-on-save-mode)
   :mode "\\.html\\'")
 
 (use-package css-ts-mode
   :ensure nil
-  :hook (css-ts-mode . my/enable-prettier-on-save)
+  :hook (css-ts-mode . prettier-format-on-save-mode)
   :mode "\\.css\\'")
 
 ;; Reading News
@@ -438,7 +440,14 @@
           ("Rahul M. Juliato" "https://www.rahuljuliato.com/rss.xml" nil 3600)
           ("Birgun" "https://www.birgun.net/rss/home" nil 3600)
           ("Levizja Bashke" "https://levizjabashke.al/feed.xml" nil 3600)
-          ("Emacs Life" "https://planet.emacslife.com/atom.xml" nil 3600))))
+          ("Emacs Life" "https://planet.emacslife.com/atom.xml" nil 3600)
+          ;; Youtube
+          ("Sleepy Lifts" "https://www.youtube.com/feeds/videos.xml?playlist_id=UULF4fGQ2r7AcFYAop6qyg_GDw" nil 3600)
+          ("Religion For Breakfast" "https://www.youtube.com/feeds/videos.xml?playlist_id=UULFct9aR7HC79Cv2g-9oDOTLw" nil 3600)
+          ("Youtux" "https://www.youtube.com/feeds/videos.xml?playlist_id=UULFYlMGSxDy8fCQGXesK64aEg" nil 3600)
+          ("Weightlifting House" "https://www.youtube.com/feeds/videos.xml?playlist_id=UULFd5WxLFvKjEbJl5xyUqyHSw" nil 3600)
+          ("Emirhan Takva" "https://www.youtube.com/feeds/videos.xml?playlist_id=UULFfEB3XTHTughd6v9c6ctsAQ" nil 3600)
+          ("Enis Kirazoglu" "https://www.youtube.com/feeds/videos.xml?playlist_id=UULFXin0u5SrVEBjn5LhOoG97A" nil 3600))))
 
 (use-package tab-bar
   :ensure nil
@@ -488,6 +497,17 @@
 (use-package reformatter
   :ensure t
   :config
+  (reformatter-define prettier-format
+  :program "prettier"
+  :args (let ((config (locate-dominating-file default-directory ".prettierrc"))
+              ;; Get the current file name or a fallback if the buffer isn't saved
+              (file-name (or (buffer-file-name) "index.js")))
+          (append
+           (list "--stdin-filepath" file-name)
+           (if config
+               (list "--config" (expand-file-name ".prettierrc" config))
+             '())))
+  :lighter " Prettier")
   (reformatter-define gofumpt-format
     :program "gofumpt"
     :args '()
@@ -575,18 +595,20 @@
   :ensure nil
   :defer 20
   :config
+  (setq mail-user-agent 'mu4e)
   ;; This is set to 't' to avoid mail syncing issues when using mbsync
   (setq mu4e-change-filenames-when-moving t)
 
   ;; Refresh mail using isync every 10 minutes
   (setq mu4e-update-interval (* 10 60))
   (setq mu4e-get-mail-command "mbsync -a")
-  (setq mu4e-maildir "~/Mail")
+  (setq mu4e-maildir "~/mail")
 
   (setq mu4e-drafts-folder "/[Gmail]/Drafts")
   (setq mu4e-sent-folder   "/[Gmail]/Sent Mail")
   (setq mu4e-refile-folder "/[Gmail]/All Mail")
   (setq mu4e-trash-folder  "/[Gmail]/Trash")
+  (setq mu4e-attachment-dir "~/downloads")
 
 
 (setq mu4e-maildir-shortcuts

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-WALLPAPER_DIR="$HOME/Pictures/Wallpapers"
+WALLPAPER_DIR="$HOME/dotfiles/wallpapers"
 
 # Check if directory exists
 if [[ ! -d "$WALLPAPER_DIR" ]]; then

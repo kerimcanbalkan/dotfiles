@@ -38,7 +38,8 @@ static const Rule rules[] = {
     {"st", NULL, NULL, 1 << 2, 0, -1},
 
     /* Content Consumption (workspace 4) */
-    {"firefox-esr", NULL, NULL, 1 << 3, 0, -1},
+    {"mpv", NULL, NULL, 1 << 3, 0, -1},
+    {"firefox", NULL, NULL, 1 << 3, 0, -1},
 
     /* Email (workspace 5) */
     {"thunderbird-default", NULL, NULL, 1 << 4, 0, -1},
@@ -92,7 +93,7 @@ static const char *emacscmd[] = {"emacsclient", "-c", "-n", "-a", "", NULL};
 static const char *colorpickercmd[] = {
     "/home/kerim/dotfiles/scripts/color-picker.sh", NULL};
 static const char *wallpaperselectorcmd[] = {
-    "/home/kerim/scripts/wallpaper-selector.sh", NULL};
+    "/home/kerim/dotfiles/scripts/wallpaper-selector.sh", NULL};
 static const char *passmenucmd[] = {"/home/kerim/dotfiles/scripts/passmenu.sh",
                                     NULL};
 static const char *upbrightness[] = {"brightnessctl", "set", "+5%", NULL};
@@ -103,7 +104,7 @@ static const char *volumeDown[] = {"pactl", "set-sink-volume", "@DEFAULT_SINK@",
                                    "-5%", NULL};
 static const char *volumeMute[] = {"pactl", "set-sink-mute", "@DEFAULT_SINK@",
                                    "toggle", NULL};
-static const char *screenshotcmd[] = {"/home/kerim/dotfiles/capture.sh", NULL};
+static const char *screenshotcmd[] = {"/home/kerim/dotfiles/scripts/capture.sh", NULL};
 
 static const Key keys[] = {
     /* modifier                     key        function        argument */

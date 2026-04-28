@@ -70,6 +70,11 @@ static const struct arg args[] = {
   { ram_perc,      "RAM: %s%% | ",   NULL },
   { battery_perc,  "BAT: %s%%",    "BAT0" },
   { battery_state, " [%s] | ",       "BAT0" },
-  { run_command,       "VOL: %s | ",             "amixer get Master | awk -F'[][]' 'END{ print $2 }'" },
+  { run_command, "VOL: %s | ", "pactl get-sink-volume @DEFAULT_SINK@ | awk '/Volume/ {print $5}'" },
   { datetime,       "%s ",                       "%H:%M:%S | %d.%m.%Y" },
 };
+
+
+
+
+

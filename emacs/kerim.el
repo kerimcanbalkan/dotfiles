@@ -82,5 +82,17 @@
 ;; Set theme
 (load-theme my/light-theme)
 
+;; Play videos with mpv
+(defun my/play-with-mpv (url &optional new-window)
+  "Start mpv with the given URL."
+  (interactive)
+  (message "Opening %s with mpv..." url)
+  (start-process "mpv" nil "mpv" url))
+
+;; Direct all YouTube links to mpv automatically
+(setq browse-url-handlers
+      '(("youtube\\.com\\|youtu\\.be" . my/play-with-mpv)
+        ("." . browse-url-default-browser)))
+
 ;; (provide kerim)
 ;;; kerim.el ends here

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-dir="$HOME/Pictures/Screenshots"
+dir="$HOME/pictures/screenshots"
 mkdir -p "$dir"
 
 # Ask action
@@ -23,11 +23,12 @@ if [ "$action" = "Save" ]; then
         exit 1
     fi
 
-    sxot -g "$(selx -f "%S")" | convert ppm:- "$filepath"
-    notify-send "Saved" "Screenshot saved to $filepath"
+    # -s allows interactive selection with the mouse
+    maim -s "$filepath" && notify-send "Saved" "Screenshot saved to $filepath"
 
 elif [ "$action" = "Copy" ]; then
     # Copy to clipboard (requires xclip)
-    sxot -g "$(selx -f "%S")" | convert ppm:- png:- | xclip -selection clipboard -t image/png
+    # -s for selection, then pipe output directly to xclip
+    maim -s | xclip -selection clipboard -t image/png && \
     notify-send "Copied" "Screenshot copied to clipboard"
 fi
