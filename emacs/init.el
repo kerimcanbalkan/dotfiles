@@ -247,28 +247,28 @@
   :ensure nil
   :defer t
   :custom
-  (org-directory "/Documents/Org")
+  (org-directory "/org")
   (org-agenda-files
-   '("~/Documents/Org/tasks.org"
-     "~/Documents/Org/projects.org"
-     "~/Documents/Org/notes.org"
-     "~/Documents/Org/events.org"))
-  (org-default-notes-file "~/Documents/Org/notes.org")
+   '("~/org/tasks.org"
+     "~/org/projects.org"
+     "~/org/notes.org"
+     "~/org/events.org"))
+  (org-default-notes-file "~/org/notes.org")
   (org-capture-templates
    '(("t" "New Task" entry
-      (file+headline "~/Documents/Org/tasks.org" "Inbox")
+      (file+headline "~/org/tasks.org" "Inbox")
       "* TODO %?\nCreated: %U\n")
 
      ("n" "Note" entry
-      (file+headline "~/Documents/Org/notes.org" "Notes")
+      (file+headline "~/org/notes.org" "Notes")
       "* %?\nCreated: %U\n")
 
      ("p" "Project Idea" entry
-      (file+headline "~/Documents/Org/projects.org" "Ideas")
+      (file+headline "~/org/projects.org" "Ideas")
       "* %?\nCreated: %U\n")
 
      ("e" "Event" entry
-      (file+headline "~/Documents/Org/events.org" "Events")
+      (file+headline "~/org/events.org" "Events")
       "* %?\n%^{When}t\n"))))
 
 (use-package icomplete
@@ -469,7 +469,7 @@
    ("C-c n d" . denote-dired)
    ("C-c n g" . denote-grep))
   :config
-  (setq denote-directory (expand-file-name "~/Documents/Notes/"))
+  (setq denote-directory (expand-file-name "~/notes/"))
   (denote-rename-buffer-mode 1))
 
 ;; A collection of ridiculously useful extensions
@@ -588,7 +588,16 @@
 
 (use-package magit
   :ensure t
-  :defer t)
+  :defer t
+  :bind
+  (("C-c g" . magit-status)
+   ("C-c f" . magit-dispatch)))
+
+(use-package pinentry
+  :ensure t
+  :config
+  (setq epa-pinentry-mode 'loopback)
+  (pinentry-start))
 
 ;; Email setup
 (use-package mu4e
