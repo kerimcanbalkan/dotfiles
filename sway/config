@@ -9,7 +9,7 @@
 ### Variables
 #
 # Logo key. Use Mod1 for Alt.
-set $mod Mod1
+set $mod Mod4
 # Home row direction keys, like vim
 set $left h
 set $down j
@@ -18,13 +18,13 @@ set $right l
 # Your preferred terminal emulator
 set $term footclient
 # Your preferred application launcher
-set $menu wmenu-run
+set $menu wmenu-run -N 000000 -n ffffff -S 6ae4b9 -s 000000 -f "Aporetic Sans Mono 12"
 
 ### Output configuration
 #
 # Default wallpaper (more resolutions are available in /run/current-system/sw/share/backgrounds/sway/)
 output eDP-1 scale 1
-output * bg ~/Pictures/Wallpapers/pixel-landscape.jpg fill
+output * bg /home/kerim/dotfiles/wallpapers/rage-against-the-machine.png fill
 output * allow_tearing yes
 output * max_render_time off
 
@@ -32,11 +32,11 @@ output * max_render_time off
 default_border pixel 1
 gaps inner 5
 gaps outer 5
-client.focused          #458588 #458588 #ebdbb2 #458588 #458588
-client.unfocused        #3c3836 #3c3836 #a89984 #3c3836 #3c3836
-client.focused_inactive #3c3836 #3c3836 #a89984 #3c3836 #3c3836
-client.urgent           #cc241d #cc241d #fbf1c7 #cc241d #cc241d
-client.placeholder      #282828 #282828 #ebdbb2 #282828 #282828
+client.focused          #79a8ff #79a8ff #000000 #79a8ff #79a8ff
+client.focused_inactive #323232 #323232 #bfbfbf #323232 #323232
+client.unfocused        #000000 #000000 #bfbfbf #000000 #000000
+client.urgent           #ff8059 #ff8059 #000000 #ef8b50 #ff8059
+client.placeholder      #000000 #0c0c0c #ffffff #000000 #0c0c0c
 
 ### Idle configuration
 #
@@ -65,9 +65,9 @@ exec swayidle -w \
   input type:keyboard {
       xkb_layout "us,tr"
       xkb_variant ""
-      xkb_options "ctrl:nocaps,grp:rwin_space_toggle"
-      repeat_delay 200
-      repeat_rate 35
+      xkb_options "ctrl:nocaps,grp:alt_space_toggle"
+      repeat_delay 170
+      repeat_rate 90
   }
 
 # You can also configure each device individually.
@@ -99,7 +99,7 @@ exec swayidle -w \
     bindsym $mod+Shift+r reload
 
     # Exit sway (logs you out of your Wayland session)
-    bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -B 'Yes, exit sway' 'swaymsg exit'
+    bindsym $mod+Shift+q exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -B 'Yes, exit sway' 'swaymsg exit'
 #
 # Moving around:
 #
@@ -215,39 +215,49 @@ bindsym $mod+r mode "resize"
 # Utilities:
 #
     # Special keys to adjust volume via PulseAudio
-    bindsym --locked XF86AudioMute exec wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
-    bindsym --locked XF86AudioLowerVolume exec wpctl set-volume @DEFAULT_SINK@ 5%-
-    bindsym --locked XF86AudioRaiseVolume exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+ 
-    bindsym --locked XF86AudioMicMute exec wpctl set-mute @DEFAULT_AUDUIO_SOURCE@ toggle 
+    bindsym --locked XF86AudioMute exec pactl set-sink-mute @DEFAULT_AUDIO_SINK@ toggle
+    bindsym --locked XF86AudioLowerVolume exec pactl set-sink-volume @DEFAULT_SINK@ -5%
+    bindsym --locked XF86AudioRaiseVolume exec pactl set-sink-volume @DEFAULT_SINK@ +5%
+    # bindsym --locked XF86AudioMicMute exec wpctl set-mute @DEFAULT_AUDUIO_SOURCE@ toggle
     # Special keys to adjust brightness via brightnessctl
     bindsym --locked XF86MonBrightnessDown exec brightnessctl set 5%-
     bindsym --locked XF86MonBrightnessUp exec brightnessctl set 5%+
     # Special key to take a screenshot with grim
-    bindsym $mod+s exec grim -g "$(slurp)" ~/Pictures/Screenshots/screenshot-$(date +'%Y-%m-%d-%H%M%S').png
+    bindsym $mod+s exec grim -g "$(slurp)" ~/pictures/screenshots/screenshot-$(date +'%Y-%m-%d-%H%M%S').png
+    # My password manager
+    bindsym $mod+Shift+p exec ~/dotfiles/scripts/passmenu.sh
+    # Colorpicker
+    bindsym $mod+c exec ~/dotfiles/scripts/color-picker.sh
 
 #
 # Status Bar:
 #
 # Read `man 5 sway-bar` for more information about this section.
-# bar {
-#     position bottom
-#
-#     # When the status_command prints a new line to stdout, swaybar updates.
-#     # The default just shows the current date and time.
-#     status_command ~/dotfiles/sway/status.sh
-#
-#     colors {
-#         statusline #ebdbb2
-#         background #3c3836
-#
-#         focused_workspace #458588 #83a598 #ebdbb2
-#         inactive_workspace #282828 #282828 #928374
-#     } 
-# }
+bar {
+    position top
 
+    # When the status_command prints a new line to stdout, swaybar updates.
+    status_command ~/dotfiles/sway/status.sh
+
+    colors {
+        # The bar background and the text color for the status line
+        background #000000
+        statusline #ffffff
+        separator  #595959
+        # Color scheme: <border> <background> <text>
+        focused_workspace  #79a8ff #79a8ff #000000
+        inactive_workspace #000000 #000000 #ffffff
+        urgent_workspace   #ff8059 #ff8059 #000000
+        binding_mode       #d0bc00 #d0bc00 #000000
+    }
+}
+
+exec_always pulseaudio --start
+exec_always emacs --daemon
 exec_always kanshi
-exec_always autotiling
-exec_always --no-startup-id waybar
 exec_always foot --server
+exec_always dunst
+exec_always autotiling
+exec_always gammastep -O 3500
 
 include /etc/sway/config.d/*

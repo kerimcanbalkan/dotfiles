@@ -415,19 +415,24 @@
   :hook (css-ts-mode . prettier-format-on-save-mode)
   :mode "\\.css\\'")
 
+(use-package sly
+  :ensure t
+  :custom
+  (inferior-lisp-program "sbcl"))
+
 ;; Reading News
 (use-package newsticker
   :ensure nil
   :custom
   (newsticker-retrieval-interval 0) ;; Only fetches when first opening (avoids unwanted fetching/ui locking while doing other things later)
   (newsticker-dir (expand-file-name "cache/newsticker/" user-emacs-directory))
-  ;; (newsticker-retrieval-method (if (executable-find "wget") 'extern 'intern))
-  ;; (newsticker-treeview-listwindow-visible nil)
-  ;; (newsticker-wget-arguments
-  ;;  '("--quiet"
-  ;;    "--no-hsts"
-  ;;    "--output-document=-"
-  ;;    "--append-output=/dev/null"))
+  (newsticker-retrieval-method (if (executable-find "wget") 'extern 'intern))
+  (newsticker-treeview-listwindow-visible nil)
+  (newsticker-wget-arguments
+   '("--quiet"
+     "--no-hsts"
+     "--output-document=-"
+     "--append-output=/dev/null"))
   :config
   (setq newsticker-url-list
         '(("Protesilaos" "https://protesilaos.com/master.xml" nil 3600)
@@ -441,13 +446,15 @@
           ("Birgun" "https://www.birgun.net/rss/home" nil 3600)
           ("Levizja Bashke" "https://levizjabashke.al/feed.xml" nil 3600)
           ("Emacs Life" "https://planet.emacslife.com/atom.xml" nil 3600)
-          ;; Youtube
-          ("Sleepy Lifts" "https://www.youtube.com/feeds/videos.xml?playlist_id=UULF4fGQ2r7AcFYAop6qyg_GDw" nil 3600)
-          ("Religion For Breakfast" "https://www.youtube.com/feeds/videos.xml?playlist_id=UULFct9aR7HC79Cv2g-9oDOTLw" nil 3600)
-          ("Youtux" "https://www.youtube.com/feeds/videos.xml?playlist_id=UULFYlMGSxDy8fCQGXesK64aEg" nil 3600)
-          ("Weightlifting House" "https://www.youtube.com/feeds/videos.xml?playlist_id=UULFd5WxLFvKjEbJl5xyUqyHSw" nil 3600)
-          ("Emirhan Takva" "https://www.youtube.com/feeds/videos.xml?playlist_id=UULFfEB3XTHTughd6v9c6ctsAQ" nil 3600)
-          ("Enis Kirazoglu" "https://www.youtube.com/feeds/videos.xml?playlist_id=UULFXin0u5SrVEBjn5LhOoG97A" nil 3600))))
+          ("Celtic Star" "https://thecelticstar.com/feed/" nil 3600)
+          ;; ;; Youtube
+          ;; ("Sleepy Lifts" "https://www.youtube.com/feeds/videos.xml?playlist_id=UULF4fGQ2r7AcFYAop6qyg_GDw" nil 3600)
+          ;; ("Religion For Breakfast" "https://www.youtube.com/feeds/videos.xml?playlist_id=UULFct9aR7HC79Cv2g-9oDOTLw" nil 3600)
+          ;; ("Youtux" "https://www.youtube.com/feeds/videos.xml?playlist_id=UULFYlMGSxDy8fCQGXesK64aEg" nil 3600)
+          ;; ("Weightlifting House" "https://www.youtube.com/feeds/videos.xml?playlist_id=UULFd5WxLFvKjEbJl5xyUqyHSw" nil 3600)
+          ;; ("Emirhan Takva" "https://www.youtube.com/feeds/videos.xml?playlist_id=UULFfEB3XTHTughd6v9c6ctsAQ" nil 3600)
+          ;; ("Enis Kirazoglu" "https://www.youtube.com/feeds/videos.xml?playlist_id=UULFXin0u5SrVEBjn5LhOoG97A" nil 3600)
+          )))
 
 (use-package tab-bar
   :ensure nil
@@ -596,7 +603,7 @@
 (use-package pinentry
   :ensure t
   :config
-  (setq epa-pinentry-mode 'loopback)
+  (setq epg-pinentry-mode 'loopback)
   (pinentry-start))
 
 ;; Email setup

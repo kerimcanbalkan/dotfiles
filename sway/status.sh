@@ -1,17 +1,33 @@
+#!/bin/sh
+
 echo '{"version":1}'
 echo '['
 
 while true; do
-    battery_path="/sys/class/power_supply/BAT0/"
-    capacity=$(cat "$battery_path/capacity")
-    battery="${capacity}%"
-    weather=$(curl -s "wttr.in/?format=1") # e.g. 🌦️ +15°C
-    date_formatted=$(date "+%A %B %d")     # e.g. Friday May 05
-    time_formatted=$(date "+%H:%M")        # e.g. 13:45
-    
-    text="$battery | $weather | $date_formatted | $time_formatted"
+    # 1. Temperature (Converted from millidegrees to degrees)
+    temp_raw=$(cat /sys/class/thermal/thermal_zone8/temp)
+    temp=$((temp_raw / 1000))
 
-    echo "[{\"full_text\":\"$text\"}]"
+    # 2. RAM Percentage
+    ram_perc=$(free | grep Mem | awk '{print int($3/$2 * 100)}')
 
-    sleep 60
+    # 3. Battery Percentage and State
+    bat_path="/sys/class/power_supply/BAT0"
+    bat_perc=$(cat "$bat_path/capacity")
+    bat_state=$(cat "$bat_path/status") # e.g., Charging, Discharging
+
+    # 4. Volume (using pactl)
+    vol=$(pactl get-sink-volume @DEFAULT_SINK@ | awk '/Volume/ {print $5}')
+
+    # 5. Date and Time (Matching %H:%M:%S | %d.%m.%Y)
+    datetime=$(date "+%H:%M:%S | %d.%m.%Y")
+
+    # Format the full text string to match slstatus output
+    # Format: TEMP: 45°C | RAM: 12% | BAT: 95% [Discharging] | VOL: 50% | 14:00:00 | 01.01.2024
+    text="TEMP: ${temp}°C | RAM: ${ram_perc}% | BAT: ${bat_perc}% [${bat_state}] | VOL: ${vol} | ${datetime}"
+
+    # Output as a JSON array for Sway
+    echo "[{\"full_text\":\"$text\"}],"
+
+    sleep 1
 done
