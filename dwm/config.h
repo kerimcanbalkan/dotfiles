@@ -8,11 +8,11 @@ static const int showbar = 1;           /* 0 means no bar */
 static const int topbar = 1;            /* 0 means bottom bar */
 static const char *fonts[] = {"Aporetic Sans Mono:size=13"};
 static const char dmenufont[] = "Aporetic Sans Mono:size=13";
-static const char col_gray1[] = "#ffffff";
-static const char col_gray2[] = "#231a1f";
-static const char col_gray3[] = "#18000e";
-static const char col_gray4[] = "#ffffff";
-static const char col_cyan[] = "#18000e";
+static const char col_gray1[] = "#000000";
+static const char col_gray2[] = "#000000";
+static const char col_gray3[] = "#ffffff";
+static const char col_gray4[] = "#000000";
+static const char col_cyan[] = "#79a8ff";
 static const char *colors[][3] = {
     /*               fg         bg         border   */
     [SchemeNorm] = {col_gray3, col_gray1, col_gray2},
