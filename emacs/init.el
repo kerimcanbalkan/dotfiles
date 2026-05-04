@@ -8,6 +8,13 @@
 ;; This is my personal GNU Emacs configuration, I mostly try to use native packages rather than relying on external ones.  An keep it as simple as possible.
 
 ;; Load my custom functions
+(require 'package)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+;; Comment/uncomment this line to enable MELPA Stable if desired.  See `package-archive-priorities`
+;; and `package-pinned-packages`. Most users will not need or want to do this.
+;;(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
+(package-initialize)
+
 (load (expand-file-name "kerim.el" user-emacs-directory))
 
 ;; Hopefully read environment variables
@@ -78,6 +85,7 @@
   :init
 
   :config
+  (setq treesit-extra-load-path '("~/.config/emacs/tree-sitter"))
   ;; Set Font
   ;; (set-face-font 'default "Aporetic Sans Mono 15")
 
@@ -606,7 +614,13 @@
   (setq epg-pinentry-mode 'loopback)
   (pinentry-start))
 
+(use-package treesit-auto
+  :ensure t)
+
 ;; Email setup
+(add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e/")
+(require 'mu4e)
+
 (use-package mu4e
   :ensure nil
   :defer 20
@@ -618,7 +632,7 @@
   ;; Refresh mail using isync every 10 minutes
   (setq mu4e-update-interval (* 10 60))
   (setq mu4e-get-mail-command "mbsync -a")
-  (setq mu4e-maildir "~/mail")
+  (setq mu4e-maildir "~/mail/")
 
   (setq mu4e-drafts-folder "/[Gmail]/Drafts")
   (setq mu4e-sent-folder   "/[Gmail]/Sent Mail")

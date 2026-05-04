@@ -1,0 +1,26 @@
+[global]
+    monitor = 0
+    follow = mouse
+    width = 370
+    height = (0,350)
+    offset = (0,19)
+    padding = 2
+    horizontal_padding = 2
+    font = Aporetic Sans Mono 12
+    format = "<b>%s</b>\n%b"
+
+[urgency_low]
+    background = "#000000"
+    foreground = "#ffffff"
+    timeout = 3
+
+[urgency_normal]
+    background = "#000000"
+    foreground = "#a0d7f2"
+    timeout = 5
+
+[urgency_critical]
+    background = "#000000"
+    foreground = "#ff5f59"
+    frame_color = "#ff5f59"
+    timeout = 10

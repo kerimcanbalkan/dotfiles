@@ -23,3 +23,14 @@ emacs/tree-sitter/
 emacs/tramp
 emacs/.lsp-session
 emacs/projects
+
+# C binaries and objects
+*.o
+*.a
+*.so
+
+# Specific suckless tool binaries
+dwm/dwm
+st/st
+slstatus/slstatus
+slock/slock
