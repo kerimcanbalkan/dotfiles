@@ -75,7 +75,7 @@ static const char *colorpickercmd[] = {
     "/home/kerim/dotfiles/scripts/color-picker.sh", NULL};
 static const char *wallpaperselectorcmd[] = {
     "/home/kerim/dotfiles/scripts/wallpaper-selector.sh", NULL};
-static const char *passmenucmd[] = {"/home/kerim/dotfiles/scripts/passmenu.sh",
+static const char *passmenucmd[] = {"passmenu",
                                     NULL};
 static const char *upbrightness[] = {"brightnessctl", "set", "+5%", NULL};
 static const char *downbrightness[] = {"brightnessctl", "set", "5%-", NULL};

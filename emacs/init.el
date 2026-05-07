@@ -7,20 +7,23 @@
 ;;; Commentary:
 ;; This is my personal GNU Emacs configuration, I mostly try to use native packages rather than relying on external ones.  An keep it as simple as possible.
 
-;; Load my custom functions
+;; Initialize package archives
 (require 'package)
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+
 ;; Comment/uncomment this line to enable MELPA Stable if desired.  See `package-archive-priorities`
 ;; and `package-pinned-packages`. Most users will not need or want to do this.
-;;(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
+(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 (package-initialize)
 
+;; Load my custom functions
 (load (expand-file-name "kerim.el" user-emacs-directory))
 
 ;; Hopefully read environment variables
 (use-package exec-path-from-shell
   :ensure t
   :config
+  ;; Add GPG_AGENT_INFO to the list of variables to import
+  (setq exec-path-from-shell-variables '("PATH" "MANPATH" "GPG_AGENT_INFO" "SSH_AUTH_SOCK"))
   (exec-path-from-shell-initialize))
 
 ;;; Code:
@@ -49,6 +52,8 @@
   (text-mode-ispell-word-completion nil)
   (tab-width 4)                                   ;; Set the tab width to 4 spaces.
   (treesit-font-lock-level 4)                     ;; Use advanced font locking for Treesit mode.
+  (treesit-auto-install-grammar t) ; EMACS-31
+  (treesit-enabled-modes t)        ; EMACS-31
   (electric-pair-mode t)
   (electric-indent-mode t)
   (read-extended-command-predicate #'command-completion-default-include-p)
@@ -90,7 +95,7 @@
   ;; (set-face-font 'default "Aporetic Sans Mono 15")
 
   ;; Transparency
-  ;;(add-to-list 'default-frame-alist '(alpha-background . 90))
+  (add-to-list 'default-frame-alist '(alpha-background . 80))
 
   ;; Disable bidirectional text scanning
   (setq-default bidi-display-reordering 'left-to-right
@@ -136,15 +141,24 @@
   ;; Set the default coding system for files to UTF-8.
   (modify-coding-system-alist 'file "" 'utf-8)
   (setq-default mode-line-format
-  '((:eval
-     (let ((branch (when vc-mode
-                     (string-trim vc-mode))))
-       (format "%s  %s%s  %d:%d"
-               (buffer-name)
-               (if branch " " "")
-               (or branch "")
-               (line-number-at-pos)
-               (current-column)))))))
+ '((:eval
+    (let* ((branch (when vc-mode (string-trim (substring vc-mode 5))))
+           ;; Prepare the left side
+           (left (format " %s " (buffer-name)))
+           ;; Prepare the right side
+           (right (format "%s%s  %d:%d "
+                          (if branch " " "")
+                          (or branch "")
+                          (line-number-at-pos)
+                          (current-column)))
+           ;; Calculate the available empty space
+           (available-width (- (window-total-width)
+                               (length left)
+                               (length right))))
+      (append (list left)
+              (list (propertize " " 'display `(space :align-to (- right ,(length right)))))
+              (list right))))))
+  )
 
   (defun my-select-window (window)
         (select-window window))
@@ -300,6 +314,13 @@
   (setq icomplete-with-completion-tables t)
   (setq icomplete-max-delay-chars 0)
   (setq icomplete-scroll t))
+
+(use-package orderless
+  :ensure t
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-overrides '((file (styles partial-completion))))
+  (completion-pcm-leading-wildcard t)) ;; Emacs 31: partial-completion behaves like substring
 
 ;; Setup lsp
 (use-package eglot
@@ -493,7 +514,7 @@
   :config
   (global-set-key [remap move-beginning-of-line] #'crux-move-beginning-of-line)
   (global-set-key (kbd "C-c o") #'crux-open-with)
-  (global-set-key (kbd "C-c e") #'crux-duplicate-current-line-or-region)
+  (global-set-key (kbd "C-c v") #'crux-duplicate-current-line-or-region)
   (global-set-key (kbd "C-c s") #'crux-sudo-edit)
   (global-set-key (kbd "C-c d t") #'crux-insert-date)
   (global-set-key [(shift return)] #'crux-smart-open-line)
@@ -537,9 +558,9 @@
 (use-package multiple-cursors
   :ensure t
   :config
-  (global-set-key (kbd "C-c m e") 'mc/edit-lines)
-  (global-set-key (kbd "C-c m w") 'mc/mark-next-like-this-word)
-  (global-set-key (kbd "C-c m t") 'mc/mark-next-like-this))
+  (global-set-key (kbd "C-c e e") 'mc/edit-lines)
+  (global-set-key (kbd "C-c e w") 'mc/mark-next-like-this-word)
+  (global-set-key (kbd "C-c e t") 'mc/mark-next-like-this))
 
 (use-package avy
   :ensure t
@@ -548,7 +569,7 @@
   (global-set-key (kbd "M-g e") 'avy-goto-word-0)
   (global-set-key (kbd "M-g w") 'avy-goto-word-1)
   (global-set-key (kbd "M-g f") 'avy-goto-line)
-  (global-set-key (kbd "C-'") 'avy-goto-char-2))
+  (global-set-key (kbd "C-'") 'avy-goto-char))
 
 (use-package corfu
   :ensure t
@@ -574,6 +595,13 @@
 ;; (use-package nix-mode
 ;;   :ensure t
 ;;   :mode "\\.nix\\'")
+
+(use-package treesit-auto
+  :custom
+  (treesit-auto-install 'prompt)
+  :config
+  (treesit-auto-add-to-auto-mode-alist 'all)
+  (global-treesit-auto-mode))
 
 (use-package diff-hl
   :ensure t
@@ -601,6 +629,33 @@
   (setq nov-text-width 80
         visual-fill-column-center-text t))
 
+(use-package emms
+  :ensure t
+  :config
+  ;; Initialize the default EMMS setup
+  (emms-all)
+  (emms-default-players)
+
+  ;; Use MPV as the primary player
+  (setq emms-player-list '(emms-player-mpv))
+
+  ;; Set your music directory
+  (setq emms-source-file-default-directory "~/music/")
+
+  ;; Enable metadata caching for faster browsing
+  (setq emms-info-asynchronously t)
+  (setq emms-source-file-directory-tree-function 'emms-source-file-directory-tree-find)
+
+  ;; Keybindings for global control
+  :bind
+  (("C-c m g" . emms-play-directory)
+   ("C-c m d" . emms-play-dired)
+   ("C-c m p" . emms-pause)
+   ("C-c m s" . emms-stop)
+   ("C-c m n" . emms-next)
+   ("C-c m b" . emms-previous)
+   ("C-c m e" . emms-smart-browse)))
+
 (use-package magit
   :ensure t
   :defer t
@@ -614,8 +669,10 @@
   (setq epg-pinentry-mode 'loopback)
   (pinentry-start))
 
-(use-package treesit-auto
-  :ensure t)
+(use-package dtrt-indent
+  :ensure t
+  :config
+  (dtrt-indent-global-mode))
 
 ;; Email setup
 (add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e/")
@@ -626,6 +683,7 @@
   :defer 20
   :config
   (setq mail-user-agent 'mu4e)
+
   ;; This is set to 't' to avoid mail syncing issues when using mbsync
   (setq mu4e-change-filenames-when-moving t)
 
@@ -634,19 +692,19 @@
   (setq mu4e-get-mail-command "mbsync -a")
   (setq mu4e-maildir "~/mail/")
 
-  (setq mu4e-drafts-folder "/[Gmail]/Drafts")
-  (setq mu4e-sent-folder   "/[Gmail]/Sent Mail")
-  (setq mu4e-refile-folder "/[Gmail]/All Mail")
-  (setq mu4e-trash-folder  "/[Gmail]/Trash")
+  (setq mu4e-drafts-folder "/[Gmail].Drafts")
+  (setq mu4e-sent-folder   "/[Gmail].Sent Mail")
+  (setq mu4e-refile-folder "/[Gmail].All Mail")
+  (setq mu4e-trash-folder  "/[Gmail].Trash")
   (setq mu4e-attachment-dir "~/downloads")
 
 
 (setq mu4e-maildir-shortcuts
-    '((:maildir "/Inbox"    :key ?i)
-      (:maildir "/[Gmail]/Sent Mail" :key ?s)
-      (:maildir "/[Gmail]/Trash"     :key ?t)
-      (:maildir "/[Gmail]/Drafts"    :key ?d)
-      (:maildir "/[Gmail]/All Mail"  :key ?a)))
+    '((:maildir "/INBOX"    :key ?i)
+      (:maildir "/[Gmail].Sent Mail" :key ?s)
+      (:maildir "/[Gmail].Trash"     :key ?t)
+      (:maildir "/[Gmail].Drafts"    :key ?d)
+      (:maildir "/[Gmail].All Mail"  :key ?a)))
   (setq message-send-mail-function 'smtpmail-send-it)
   (setq smtpmail-smtp-server "smtp.gmail.com"
                         smtpmail-smtp-service 587

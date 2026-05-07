@@ -20,6 +20,10 @@ emacs/recentf
 emacs/straight/
 emacs/transient/
 emacs/tree-sitter/
+emacs/.mc-lists.el
+emacs/cache/
+emacs/undo-fu-session/
+emacs/custom-vars.el
 emacs/tramp
 emacs/.lsp-session
 emacs/projects

@@ -1,0 +1,11 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhistcnt =9
+let g:netrw_dirhist_9='/home/kerim/projects/travel-albania/fe-travel'
+let g:netrw_dirhist_8='/home/kerim/projects/travel-albania/fe-travel/src/app/[locale]/who-we-are'
+let g:netrw_dirhist_7='/home/kerim/projects/travel-albania/fe-travel/src/app/[locale]'
+let g:netrw_dirhist_6='/home/kerim/projects/travel-albania/fe-travel/src/app/[locale]/blogs'
+let g:netrw_dirhist_5='/home/kerim/projects/travel-albania/fe-travel/src/app/[locale]'
+let g:netrw_dirhist_4='/home/kerim/projects/travel-albania/fe-travel/src/app'
+let g:netrw_dirhist_3='/home/kerim/projects/travel-albania/fe-travel/src'
+let g:netrw_dirhist_2='/home/kerim/projects/travel-albania/fe-travel'
+let g:netrw_dirhist_1='/home/kerim/dotfiles/vim'
