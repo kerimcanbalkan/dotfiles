@@ -37,8 +37,8 @@
   (delete-selection-mode 1)                       ;; Enable replacing selected text with typed text.
   (global-auto-revert-non-file-buffers t)         ;; Automatically refresh non-file buffers.
   (history-length 25)                             ;; Set the length of the command history.
-  (inhibit-splash-screen nil)
-  (inhibit-startup-screen nil)
+  (inhibit-splash-screen t)
+  (inhibit-startup-screen t)
   (indent-tabs-mode nil)                          ;; Disable the use of tabs for indentation (use spaces instead).
   (initial-scratch-message "")                    ;; Clear the initial message in the *scratch* buffer.
   (ispell-dictionary "en_US")                     ;; Set the default dictionary for spell checking.
@@ -62,7 +62,6 @@
   (use-dialog-box nil)                            ;; Disable dialog boxes in favor of minibuffer prompts.
   (use-short-answers t)                           ;; Use short answers in prompts for quicker responses (y instead of yes)
   (warning-minimum-level :emergency)              ;; Set the minimum level of warnings to display.
-  (browse-url-browser-function 'eww-browse-url)
   (next-line-add-newlines t)
   (doc-view-continuous t)
   (user-mail-address "kerimcanbalkan@gmail.com"
@@ -91,11 +90,8 @@
 
   :config
   (setq treesit-extra-load-path '("~/.config/emacs/tree-sitter"))
-  ;; Set Font
-  ;; (set-face-font 'default "Aporetic Sans Mono 15")
-
   ;; Transparency
-  (add-to-list 'default-frame-alist '(alpha-background . 80))
+  (add-to-list 'default-frame-alist '(alpha-background . 70))
 
   ;; Disable bidirectional text scanning
   (setq-default bidi-display-reordering 'left-to-right
@@ -123,7 +119,7 @@
   (global-set-key [remap dabbrev-expand] 'hippie-expand)
 
   :init                        ;; Initialization settings that apply before the package is loaded.
-  (add-to-list 'default-frame-alist '(font . "Aporetic Sans Mono-15"))
+  (add-to-list 'default-frame-alist '(font . "FreeMono-13"))
   (tool-bar-mode -1)           ;; Disable the tool bar for a cleaner interface.
   (menu-bar-mode -1)           ;; Disable the menu bar for a more streamlined look.
   (tooltip-mode -1)
@@ -141,23 +137,30 @@
   ;; Set the default coding system for files to UTF-8.
   (modify-coding-system-alist 'file "" 'utf-8)
   (setq-default mode-line-format
- '((:eval
-    (let* ((branch (when vc-mode (string-trim (substring vc-mode 5))))
-           ;; Prepare the left side
-           (left (format " %s " (buffer-name)))
-           ;; Prepare the right side
-           (right (format "%s%s  %d:%d "
-                          (if branch " " "")
-                          (or branch "")
-                          (line-number-at-pos)
-                          (current-column)))
-           ;; Calculate the available empty space
-           (available-width (- (window-total-width)
-                               (length left)
-                               (length right))))
-      (append (list left)
-              (list (propertize " " 'display `(space :align-to (- right ,(length right)))))
-              (list right))))))
+                '((:eval
+                   (let* ((branch (when vc-mode (string-trim (substring vc-mode 5))))
+                          ;; format-mode-line cleans up the 'mode-name' list/string
+                          (mode-str (format-mode-line mode-name))
+                          ;; Truncate the mode name if it's longer than 12 chars to save space
+                          (mode (if (> (length mode-str) 12)
+                                    (format "[%s…]" (substring mode-str 0 10))
+                                  (format "[%s]" mode-str)))
+                          ;; Prepare the left side
+                          (left (format " %s " (buffer-name)))
+                          ;; Prepare the right side
+                          (right (format "%s %s%s  %d:%d "
+                                         mode
+                                         (if branch " " "")
+                                         (or branch "")
+                                         (line-number-at-pos)
+                                         (current-column)))
+                          ;; Calculate the available empty space
+                          (available-width (- (window-total-width)
+                                              (length left)
+                                              (length right))))
+                     (append (list left)
+                             (list (propertize " " 'display `(space :align-to (- right ,(length right)))))
+                             (list right))))))
   )
 
   (defun my-select-window (window)
@@ -315,70 +318,57 @@
   (setq icomplete-max-delay-chars 0)
   (setq icomplete-scroll t))
 
-(use-package orderless
-  :ensure t
-  :custom
-  (completion-styles '(orderless basic))
-  (completion-category-overrides '((file (styles partial-completion))))
-  (completion-pcm-leading-wildcard t)) ;; Emacs 31: partial-completion behaves like substring
+
 
 ;; Setup lsp
 (use-package eglot
   :ensure nil
-  :preface
-  :hook ((c-mode c++-mode
-                 go-ts-mode go-mode
-                 web-mode js-ts-mode
-                 typescript-ts-mode
-                 html-ts-mode
-                 css-ts-mode
-                 tsx-ts-mode
-                 lua-mode)
-         . eglot-ensure)
-    :init
-  (with-eval-after-load 'eglot
-    (add-to-list
-     'eglot-server-programs
-     '((tsx-ts-mode js-jsx-mode)
-       . ("rass"
-          "--"
-          "typescript-language-server" "--stdio"
-          ;; "--"
-          ;; "eslint-lsp" "--stdio"
-          "--"
-          "tailwindcss-language-server" "--stdio"))))
   :bind (:map
          eglot-mode-map
          ("C-c l a" . eglot-code-actions)
          ("C-c l o" . eglot-code-action-organize-imports)
          ("C-c l r" . eglot-rename)
          ("C-c l i" . eglot-inlay-hints-mode)
-         ("C-c l f" . eglot-format-buffer))
-  :config
-  (add-hook 'before-save-hook 'eglot-format-buffer nil t)
-  (setq-default eglot-workspace-configuration
-                '((:tailwindCSS
-                   (:includeLanguages
-                    (:typescriptreact "html"
-                                      :typescript "html"
-                                      :javascript "html"
-                                      :javascriptreact "html")))))
-  (setq eglot-ignored-server-capabilities '( :documentHighlightProvider))
-  (setf (plist-get eglot-events-buffer-config :size) 0)
-  (add-to-list 'eglot-server-programs
-               '(text-mode . ("harper-ls" "--stdio")))
-  (add-to-list 'eglot-server-programs
-               '(org-mode  . ("harper-ls" "--stdio")))
+         ("C-c l f" . eglot-format))
+
   :custom
-  (fset #'jsonrpc--log-event #'ignore)
-  (eglot-events-buffer-size 0)
-  (eglot-sync-connect nil)
-  (eglot-connect-timeout nil)
   (eglot-autoshutdown t)
-  (eglot-send-changes-idle-time 3)
-  (flymake-no-changes-timeout 5)
-  (eldoc-echo-area-use-multiline-p nil)
-  (eglot-report-progress nil))
+  (eglot-events-buffer-config '(:size 0 :format full))
+  (eglot-prefer-plaintext nil)
+  (eglot-code-action-indications nil) ;; Disable annoying Emacs 31 indicators
+
+  :init
+  ;; Unified Workspace Configuration
+  ;; This ensures Tailwind AND Go settings coexist without overwriting each other
+  (setq-default eglot-workspace-configuration
+                '(:tailwindCSS (:includeLanguages (:tsx "html"
+                                                   :typescriptreact "html"
+                                                   :javascriptreact "html")
+                                :userLanguages (:tsx "html"
+                                                :typescriptreact "html"))
+                  :gopls (:hints (:parameterNames t))))
+
+  ;; Mute the JSONRPC logging to keep things snappy
+  (fset #'jsonrpc--log-event #'ignore)
+
+  (defun my/eglot-setup ()
+    "Automatically start eglot except in Lisp modes."
+    (unless (memq major-mode '(emacs-lisp-mode lisp-mode))
+      (eglot-ensure)))
+
+  (add-hook 'prog-mode-hook #'my/eglot-setup)
+
+  :config
+  ;; 1. Map the major modes to the multiplexer "rass"
+  ;; 2. Explicitly set :language-id to "typescriptreact" for TSX
+  ;;    This is the secret sauce for Tailwind to 'wake up' in .tsx files
+  (add-to-list
+   'eglot-server-programs
+   '(((tsx-ts-mode :language-id "typescriptreact")
+      typescript-ts-mode js-mode js-jsx-mode js-ts-mode)
+     . ("rass"
+        "--" "typescript-language-server" "--stdio"
+        "--" "tailwindcss-language-server" "--stdio"))))
 
 (use-package project
   :ensure nil
@@ -447,7 +437,7 @@
 (use-package sly
   :ensure t
   :custom
-  (inferior-lisp-program "sbcl"))
+  (inferior-lisp-program "clisp"))
 
 ;; Reading News
 (use-package newsticker
@@ -477,12 +467,18 @@
           ("Emacs Life" "https://planet.emacslife.com/atom.xml" nil 3600)
           ("Celtic Star" "https://thecelticstar.com/feed/" nil 3600)
           ;; ;; Youtube
-          ;; ("Sleepy Lifts" "https://www.youtube.com/feeds/videos.xml?playlist_id=UULF4fGQ2r7AcFYAop6qyg_GDw" nil 3600)
-          ;; ("Religion For Breakfast" "https://www.youtube.com/feeds/videos.xml?playlist_id=UULFct9aR7HC79Cv2g-9oDOTLw" nil 3600)
-          ;; ("Youtux" "https://www.youtube.com/feeds/videos.xml?playlist_id=UULFYlMGSxDy8fCQGXesK64aEg" nil 3600)
-          ;; ("Weightlifting House" "https://www.youtube.com/feeds/videos.xml?playlist_id=UULFd5WxLFvKjEbJl5xyUqyHSw" nil 3600)
-          ;; ("Emirhan Takva" "https://www.youtube.com/feeds/videos.xml?playlist_id=UULFfEB3XTHTughd6v9c6ctsAQ" nil 3600)
-          ;; ("Enis Kirazoglu" "https://www.youtube.com/feeds/videos.xml?playlist_id=UULFXin0u5SrVEBjn5LhOoG97A" nil 3600)
+          ("Sleepy Lifts" "https://www.youtube.com/feeds/videos.xml?playlist_id=UULF4fGQ2r7AcFYAop6qyg_GDw" nil 3600)
+          ("Religion For Breakfast" "https://www.youtube.com/feeds/videos.xml?playlist_id=UULFct9aR7HC79Cv2g-9oDOTLw" nil 3600)
+          ("Youtux" "https://www.youtube.com/feeds/videos.xml?playlist_id=UULFYlMGSxDy8fCQGXesK64aEg" nil 3600)
+          ("Weightlifting House" "https://www.youtube.com/feeds/videos.xml?playlist_id=UULFd5WxLFvKjEbJl5xyUqyHSw" nil 3600)
+          ("Emirhan Takva" "https://www.youtube.com/feeds/videos.xml?playlist_id=UULFfEB3XTHTughd6v9c6ctsAQ" nil 3600)
+          ("Enis Kirazoglu" "https://www.youtube.com/feeds/videos.xml?playlist_id=UULFXin0u5SrVEBjn5LhOoG97A" nil 3600)
+          ("Evrim Agaci", "https://www.youtube.com/feeds/videos.xml?channel_id=UCatnasFAiXUvWwH8NlSdd3A" nil 3600)
+          ("Agir Saglam" "https://www.youtube.com/feeds/videos.xml?channel_id=UCXH9dxtCeB3Gn_QnWnBJaTQ" nil 3600)
+          ("Omnibus" "https://www.youtube.com/feeds/videos.xml?channel_id=UCmZUVTP8dtWqmsVhqt7tPEQ" nil 3600)
+          ("Luke Smith" "https://www.youtube.com/feeds/videos.xml?channel_id=UC2eYFnH61tmytImy1mTYvhA" nil 3600)
+          ;; ("System Crafters" "https://www.youtube.com/feeds/videos.xml?channel_id=UC0uTPqBCFIpZxlz_Lv1tk_g" nil 3600)
+          ("Joshua Blais Youtube" "https://www.youtube.com/feeds/videos.xml?channel_id=UC1tV5SjRyejRGeHAaMGYSsQ" nil 3600)
           )))
 
 (use-package tab-bar
@@ -492,6 +488,14 @@
   (tab-bar-show nil))
 
 ;;; External Packages
+
+;; Completion
+(use-package orderless
+  :ensure t
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-overrides '((file (styles partial-completion))))
+  (completion-pcm-leading-wildcard t)) ;; Emacs 31: partial-completion behaves like substring
 
 ;; Note Taking
 (use-package denote
@@ -697,6 +701,7 @@
   (setq mu4e-refile-folder "/[Gmail].All Mail")
   (setq mu4e-trash-folder  "/[Gmail].Trash")
   (setq mu4e-attachment-dir "~/downloads")
+  (setq mm-discouraged-alternatives '("text/html" "text/richtext"))
 
 
 (setq mu4e-maildir-shortcuts

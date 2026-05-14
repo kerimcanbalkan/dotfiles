@@ -64,8 +64,8 @@
 (with-eval-after-load 'lisp-mode
   (define-key lisp-interaction-mode-map (kbd "C-j") #'my/eval-last-sexp-as-comment))
 
-(defvar my/light-theme 'tango)
-(defvar my/dark-theme 'modus-vivendi-tritanopia)
+(defvar my/light-theme 'modus-operandi-tritanopia)
+(defvar my/dark-theme 'wombat)
 
 (defun my/toggle-theme ()
   "Toggle between defined dark and light themes."
@@ -83,5 +83,12 @@
 ;; Set theme
 (load-theme my/dark-theme)
 
+;; Open youtube links using mpv
+(setq browse-url-browser-function
+      '(("youtube\\.com" . browse-url-mpv)
+        ("." . browse-url-default-browser)))
+
+(defun browse-url-mpv (url &optional single-window)
+  (start-process "mpv" nil "mpv" url))
 ;; (provide kerim)
 ;;; kerim.el ends here
