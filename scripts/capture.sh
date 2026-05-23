@@ -11,9 +11,9 @@ action=$(printf "Save\nCopy" | dmenu -p "Action:")
 
 if [ "$action" = "Save" ]; then
     # Default filename with timestamp
-    default_name="screenshot_$(date +%Y-%m-%d_%H-%M-%S).png"
+    default_name="screenshot_$(date +%Y-%m-%d_%H-%M-%S)"
 
-    filename=$(printf "%s" "$default_name" | dmenu -p "Save as:")
+    filename="$(printf "%s" "$default_name" | dmenu -p "Save as:").png"
     [ -z "$filename" ] && exit 1
 
     filepath="$dir/$filename"

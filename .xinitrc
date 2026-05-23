@@ -1,3 +1,4 @@
+xrandr --dpi 96		# Set DPI. User may want to use a larger number for larger screens.
 # # Keyboard settings
 xset r rate 170 90 &
 setxkbmap -layout us,tr -option grp:alt_space_toggle
@@ -5,27 +6,19 @@ setxkbmap -option ctrl:nocaps
 
 # # # Background services
 emacs --daemon &
+dunst &
 
 # # # Desktop
 redshift -O 3500 &
-xwallpaper --daemon --stretch /home/kerim/dotfiles/wallpapers/space.jpg &
+xwallpaper --daemon --stretch /home/kerim/dotfiles/wallpapers/ghibli-island.jpeg &
+xautolock -cornersize 30 -corners ---- -cornersize 30 -time 10 -locker slock &
 slstatus &
-dunst &
-# xscreensaver &
-
-# Ensure D-Bus is running
-if [ -z "$DBUS_SESSION_BUS_ADDRESS" ]; then
-  eval $(dbus-launch --sh-syntax --exit-with-session)
-fi
-
-# Set the runtime directory
-export XDG_RUNTIME_DIR="/run/user/$(id -u)"
-
-# # Start PulseAudio
-pulseaudio --start &
+xcompmgr -c &
+unclutter &
 
 # # Configure displays
 ./dotfiles/scripts/display-toggle.sh
-./dotfiles/scripts/idle-check.sh
 
-exec dwm
+dbus-update-activation-environment --all
+dbus-launch dwm
+# ./dotfiles/scripts/start-exwm.sh

@@ -64,8 +64,15 @@
 (with-eval-after-load 'lisp-mode
   (define-key lisp-interaction-mode-map (kbd "C-j") #'my/eval-last-sexp-as-comment))
 
+;; Enable tangle for common-lisp
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((lisp . t)))
+
+;; Load theme package
 (defvar my/light-theme 'modus-operandi-tritanopia)
-(defvar my/dark-theme 'wombat)
+
+(defvar my/dark-theme 'gruvbox-dark-medium)
 
 (defun my/toggle-theme ()
   "Toggle between defined dark and light themes."
@@ -81,7 +88,7 @@
 (global-set-key (kbd "<f5>") #'my/toggle-theme)
 
 ;; Set theme
-(load-theme my/dark-theme)
+;; (load-theme my/dark-theme)
 
 ;; Open youtube links using mpv
 (setq browse-url-browser-function
@@ -90,5 +97,25 @@
 
 (defun browse-url-mpv (url &optional single-window)
   (start-process "mpv" nil "mpv" url))
+
+(defvar slime-repl-font-lock-keywords lisp-font-lock-keywords-2)
+(defun slime-repl-font-lock-setup ()
+  (setq font-lock-defaults
+        '(slime-repl-font-lock-keywords
+         ;; From lisp-mode.el
+         nil nil (("+-*/.<>=!?$%_&~^:@" . "w")) nil
+         (font-lock-syntactic-face-function
+         . lisp-font-lock-syntactic-face-function))))
+
+(add-hook 'slime-repl-mode-hook 'slime-repl-font-lock-setup)
+
+(defadvice slime-repl-insert-prompt (after font-lock-face activate)
+  (let ((inhibit-read-only t))
+    (add-text-properties
+     slime-repl-prompt-start-mark (point)
+     '(font-lock-face
+      slime-repl-prompt-face
+      rear-nonsticky
+      (slime-repl-prompt read-only font-lock-face intangible)))))
 ;; (provide kerim)
 ;;; kerim.el ends here

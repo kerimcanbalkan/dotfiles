@@ -39,6 +39,9 @@
   (history-length 25)                             ;; Set the length of the command history.
   (inhibit-splash-screen t)
   (inhibit-startup-screen t)
+  (initial-buffer-choice (lambda ()
+                           (eshell)
+                           (current-buffer)))
   (indent-tabs-mode nil)                          ;; Disable the use of tabs for indentation (use spaces instead).
   (initial-scratch-message "")                    ;; Clear the initial message in the *scratch* buffer.
   (ispell-dictionary "en_US")                     ;; Set the default dictionary for spell checking.
@@ -89,9 +92,12 @@
   :init
 
   :config
+  ;; Disable blinking cursor
+  (blink-cursor-mode -1)
+
   (setq treesit-extra-load-path '("~/.config/emacs/tree-sitter"))
   ;; Transparency
-  (add-to-list 'default-frame-alist '(alpha-background . 70))
+  ;; (add-to-list 'default-frame-alist '(alpha-background . 90))
 
   ;; Disable bidirectional text scanning
   (setq-default bidi-display-reordering 'left-to-right
@@ -119,7 +125,7 @@
   (global-set-key [remap dabbrev-expand] 'hippie-expand)
 
   :init                        ;; Initialization settings that apply before the package is loaded.
-  (add-to-list 'default-frame-alist '(font . "FreeMono-13"))
+  (add-to-list 'default-frame-alist '(font . "IosevkaTerm Nerd Font Mono-14"))
   (tool-bar-mode -1)           ;; Disable the tool bar for a cleaner interface.
   (menu-bar-mode -1)           ;; Disable the menu bar for a more streamlined look.
   (tooltip-mode -1)
@@ -207,6 +213,11 @@
   (eldoc-idle-delay 0.2)
   (eldoc-echo-area-use-multiline-p t)
   (eldoc-documentation-strategy #'eldoc-documentation-compose))
+
+(use-package dired
+  :ensure nil
+  :custom
+  (dired-create-destination-dirs 'ask))
 
 ;;; │ MAN
 (use-package man
@@ -323,52 +334,45 @@
 ;; Setup lsp
 (use-package eglot
   :ensure nil
+  :custom
+  (eglot-autoshutdown t)
+  (eglot-events-buffer-size 0) ;; EMACS-31 -- do we still need it?
+  (eglot-events-buffer-config '(:size 0 :format full))
+  (eglot-prefer-plaintext nil)
+  (jsonrpc-event-hook nil)
+  (eglot-code-action-indications nil) ;; EMACS-31 -- annoying as hell
+  :init
+  (fset #'jsonrpc--log-event #'ignore)
+
+  (setq-default eglot-workspace-configuration (quote
+                                               (:gopls (:hints (:parameterNames t)))))
+
+  (defun my/eglot-setup ()
+    "Setup eglot mode with specific exclusions."
+    (unless (memq major-mode '(emacs-lisp-mode lisp-mode))
+      (eglot-ensure)))
+
+  (add-hook 'prog-mode-hook #'my/eglot-setup)
+
+  (with-eval-after-load 'eglot
+    (add-to-list
+     'eglot-server-programs
+     '((tsx-ts-mode typescript-ts-mode js-mode js-jsx-mode js-ts-mode)
+       . ("rass"
+          "--"
+          "typescript-language-server" "--stdio"
+          ;; "--"
+          ;; "eslint-lsp" "--stdio"
+          "--"
+          "tailwindcss-language-server" "--stdio"))))
+
   :bind (:map
          eglot-mode-map
          ("C-c l a" . eglot-code-actions)
          ("C-c l o" . eglot-code-action-organize-imports)
          ("C-c l r" . eglot-rename)
          ("C-c l i" . eglot-inlay-hints-mode)
-         ("C-c l f" . eglot-format))
-
-  :custom
-  (eglot-autoshutdown t)
-  (eglot-events-buffer-config '(:size 0 :format full))
-  (eglot-prefer-plaintext nil)
-  (eglot-code-action-indications nil) ;; Disable annoying Emacs 31 indicators
-
-  :init
-  ;; Unified Workspace Configuration
-  ;; This ensures Tailwind AND Go settings coexist without overwriting each other
-  (setq-default eglot-workspace-configuration
-                '(:tailwindCSS (:includeLanguages (:tsx "html"
-                                                   :typescriptreact "html"
-                                                   :javascriptreact "html")
-                                :userLanguages (:tsx "html"
-                                                :typescriptreact "html"))
-                  :gopls (:hints (:parameterNames t))))
-
-  ;; Mute the JSONRPC logging to keep things snappy
-  (fset #'jsonrpc--log-event #'ignore)
-
-  (defun my/eglot-setup ()
-    "Automatically start eglot except in Lisp modes."
-    (unless (memq major-mode '(emacs-lisp-mode lisp-mode))
-      (eglot-ensure)))
-
-  (add-hook 'prog-mode-hook #'my/eglot-setup)
-
-  :config
-  ;; 1. Map the major modes to the multiplexer "rass"
-  ;; 2. Explicitly set :language-id to "typescriptreact" for TSX
-  ;;    This is the secret sauce for Tailwind to 'wake up' in .tsx files
-  (add-to-list
-   'eglot-server-programs
-   '(((tsx-ts-mode :language-id "typescriptreact")
-      typescript-ts-mode js-mode js-jsx-mode js-ts-mode)
-     . ("rass"
-        "--" "typescript-language-server" "--stdio"
-        "--" "tailwindcss-language-server" "--stdio"))))
+         ("C-c l f" . eglot-format)))
 
 (use-package project
   :ensure nil
@@ -434,22 +438,27 @@
   :hook (css-ts-mode . prettier-format-on-save-mode)
   :mode "\\.css\\'")
 
-(use-package sly
+(use-package slime
   :ensure t
-  :custom
-  (inferior-lisp-program "clisp"))
+  :defer t
+  :init
+  (setq inferior-lisp-program "clisp")
+  :config
+  (setq slime-lisp-implementations '((clisp ("clisp"))))
+  (slime-setup '(slime-fancy)))
 
 ;; Reading News
 (use-package newsticker
   :ensure nil
   :custom
-  (newsticker-retrieval-interval 0) ;; Only fetches when first opening (avoids unwanted fetching/ui locking while doing other things later)
+  (newsticker-retrieval-interval 0) ;; Only fetches when first opening
   (newsticker-dir (expand-file-name "cache/newsticker/" user-emacs-directory))
   (newsticker-retrieval-method (if (executable-find "wget") 'extern 'intern))
   (newsticker-treeview-listwindow-visible nil)
   (newsticker-wget-arguments
    '("--quiet"
      "--no-hsts"
+     "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
      "--output-document=-"
      "--append-output=/dev/null"))
   :config
@@ -466,20 +475,18 @@
           ("Levizja Bashke" "https://levizjabashke.al/feed.xml" nil 3600)
           ("Emacs Life" "https://planet.emacslife.com/atom.xml" nil 3600)
           ("Celtic Star" "https://thecelticstar.com/feed/" nil 3600)
-          ;; ;; Youtube
+          ;; Youtube
           ("Sleepy Lifts" "https://www.youtube.com/feeds/videos.xml?playlist_id=UULF4fGQ2r7AcFYAop6qyg_GDw" nil 3600)
           ("Religion For Breakfast" "https://www.youtube.com/feeds/videos.xml?playlist_id=UULFct9aR7HC79Cv2g-9oDOTLw" nil 3600)
           ("Youtux" "https://www.youtube.com/feeds/videos.xml?playlist_id=UULFYlMGSxDy8fCQGXesK64aEg" nil 3600)
           ("Weightlifting House" "https://www.youtube.com/feeds/videos.xml?playlist_id=UULFd5WxLFvKjEbJl5xyUqyHSw" nil 3600)
           ("Emirhan Takva" "https://www.youtube.com/feeds/videos.xml?playlist_id=UULFfEB3XTHTughd6v9c6ctsAQ" nil 3600)
           ("Enis Kirazoglu" "https://www.youtube.com/feeds/videos.xml?playlist_id=UULFXin0u5SrVEBjn5LhOoG97A" nil 3600)
-          ("Evrim Agaci", "https://www.youtube.com/feeds/videos.xml?channel_id=UCatnasFAiXUvWwH8NlSdd3A" nil 3600)
+          ("Evrim Agaci" "https://www.youtube.com/feeds/videos.xml?channel_id=UCatnasFAiXUvWwH8NlSdd3A" nil 3600)
           ("Agir Saglam" "https://www.youtube.com/feeds/videos.xml?channel_id=UCXH9dxtCeB3Gn_QnWnBJaTQ" nil 3600)
           ("Omnibus" "https://www.youtube.com/feeds/videos.xml?channel_id=UCmZUVTP8dtWqmsVhqt7tPEQ" nil 3600)
           ("Luke Smith" "https://www.youtube.com/feeds/videos.xml?channel_id=UC2eYFnH61tmytImy1mTYvhA" nil 3600)
-          ;; ("System Crafters" "https://www.youtube.com/feeds/videos.xml?channel_id=UC0uTPqBCFIpZxlz_Lv1tk_g" nil 3600)
-          ("Joshua Blais Youtube" "https://www.youtube.com/feeds/videos.xml?channel_id=UC1tV5SjRyejRGeHAaMGYSsQ" nil 3600)
-          )))
+          ("Joshua Blais Youtube" "https://www.youtube.com/feeds/videos.xml?channel_id=UC1tV5SjRyejRGeHAaMGYSsQ" nil 3600))))
 
 (use-package tab-bar
   :ensure nil
@@ -558,7 +565,7 @@
     :lighter " Gimp"))
 
 
-;; Editing
+;; Editing Enhancement
 (use-package multiple-cursors
   :ensure t
   :config
@@ -573,8 +580,13 @@
   (global-set-key (kbd "M-g e") 'avy-goto-word-0)
   (global-set-key (kbd "M-g w") 'avy-goto-word-1)
   (global-set-key (kbd "M-g f") 'avy-goto-line)
-  (global-set-key (kbd "C-'") 'avy-goto-char))
+  (global-set-key (kbd "M-j") 'avy-goto-char-in-line))
 
+(use-package expand-region
+  :ensure t
+  :bind ("C-=" . er/expand-region))
+
+;; Completion
 (use-package corfu
   :ensure t
   :custom
@@ -615,6 +627,10 @@
 ;; Display colorcodes colors on buffers
 (use-package rainbow-mode
   :ensure t
+  :hook
+  (tsx-ts-mode . rainbow-mode)
+  (html-mode . rainbow-mode)
+  (css-mode . rainbow-mode)
   :config
   (rainbow-mode))
 
@@ -716,4 +732,25 @@
                         smtpmail-stream-type 'starttls
                         smtpmail-smtp-user "kerimcanbalkan@gmail.com"
                         smtpmail-auth-credentials "~/.authinfo.gpg"))
+;; Terminal emulator
+;;  Really wanted to try this but somehow crashes the whole emacs
+;; (use-package gterm
+;;   :vc (:url "https://github.com/rwc9u/emacs-libgterm" :branch "main")
+;;   :init
+;;   (setq gterm-always-compile-module t)
+;;   (setq gterm-shell "/bin/bash")
+;;   (setq gterm-mouse-scroll-lines 5))
+
+(use-package vterm
+  :vc (:url "https://github.com/akermu/emacs-libvterm" :branch "master")
+  :ensure t)
+
+;; External theme
+(use-package gruvbox-theme
+  :ensure t
+  :init
+  (load-theme 'gruvbox t))
+
+(put 'upcase-region 'disabled nil)
+(put 'downcase-region 'disabled nil)
 ;;; init.el ends here

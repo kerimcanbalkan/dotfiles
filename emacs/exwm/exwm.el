@@ -2,13 +2,12 @@
 (defun efs/configure-window-by-class ()
   (interactive)
   (pcase exwm-class-name
-    ("Firefox" (exwm-workspace-move-window 3))
-    ("mpv" (exwm-floating-toggle-floating)
-     (exwm-layout-toggle-mode-line))))
+    ("firefox" (exwm-workspace-move-window 3))
+    ("mpv" (exwm-floating-toggle-floating))))
 
 (defun efs/exwm-init-hook ()
   ;; Make workspace 1 be the one where we land at startup
-  (exwm-workspace-switch-create 1)
+  ;; (exwm-workspace-switch-create 1)
 
   ;; Open eshell by default
   (eshell)
@@ -20,6 +19,28 @@
   (setq display-time-day-and-date t)
   (display-time-mode 1))
 
+
+;; My personal scripts
+(defun my/take-screenshot ()
+  "Take screenshot using maim."
+  (interactive)
+  (let* ((choices '("Copy" "Save"))
+         (selection (completing-read "Action: " choices nil t)))
+    (pcase selection
+      ("Copy" (shell-command "maim -s | xclip -selection clipboard -t image/png &"))
+      ("Save"
+       (setq-local filename (read-string "Filename: "))
+       (setq-local command (format "maim -s /home/kerim/pictures/screenshots/%s.png" filename))
+       (shell-command command)))))
+
+(defun my/color-picker ()
+  "Copy selected color to clipboard."
+  (interactive)
+  (let ((color (string-trim (shell-command-to-string "grabc -hex"))))
+    (unless (string-empty-p color)
+      (kill-new color)
+      (message "Copied to clipboard: %s" color))))
+
 (use-package exwm
   :ensure t
   :config
@@ -28,6 +49,9 @@
 
   ;; Initialize
   (add-hook 'exwm-init-hook #'efs/exwm-init-hook)
+
+  (setq exwm-workspace-show-all-buffers nil)
+  (setq exwm-layout-show-all-buffers nil)
 
   (setq exwm-workspace-number 6)
 
@@ -119,6 +143,12 @@
 
           ;; Switch workspace
           ([?\s-w] . exwm-workspace-switch)
+
+          ;; Take screenshot
+          ([?\s-s] . my/take-screenshot)
+
+          ;; Pick color
+          ([?\s-c] . my/color-picker)
 
           ;; 's-N': Switch to certain workspace with Super (Win) plus a number key (0 - 9)
           ,@(mapcar (lambda (i)
