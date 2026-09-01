@@ -10,8 +10,8 @@ dunst &
 
 # # # Desktop
 redshift -O 3500 &
-xwallpaper --daemon --stretch /home/kerim/dotfiles/wallpapers/ghibli-island.jpeg &
-xautolock -cornersize 30 -corners ---- -cornersize 30 -time 10 -locker slock &
+xwallpaper --daemon --stretch /home/kerim/dotfiles/wallpapers/island-house.jpg &
+xautolock -cornersize 30 -corners ---- -cornersize 30 -time 10 -notify 10 -notifier ~/dotfiles/scripts/notify-lock.sh -locker slock &
 slstatus &
 xcompmgr -c &
 unclutter &

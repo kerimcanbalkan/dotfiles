@@ -72,7 +72,7 @@
 ;; Load theme package
 (defvar my/light-theme 'modus-operandi-tritanopia)
 
-(defvar my/dark-theme 'gruvbox-dark-medium)
+(defvar my/dark-theme 'nord)
 
 (defun my/toggle-theme ()
   "Toggle between defined dark and light themes."
@@ -88,7 +88,8 @@
 (global-set-key (kbd "<f5>") #'my/toggle-theme)
 
 ;; Set theme
-;; (load-theme my/dark-theme)
+
+;;(load-theme my/dark-theme)
 
 ;; Open youtube links using mpv
 (setq browse-url-browser-function

@@ -97,7 +97,7 @@
 
   (setq treesit-extra-load-path '("~/.config/emacs/tree-sitter"))
   ;; Transparency
-  ;; (add-to-list 'default-frame-alist '(alpha-background . 90))
+  (add-to-list 'default-frame-alist '(alpha-background . 90))
 
   ;; Disable bidirectional text scanning
   (setq-default bidi-display-reordering 'left-to-right
@@ -354,18 +354,6 @@
 
   (add-hook 'prog-mode-hook #'my/eglot-setup)
 
-  (with-eval-after-load 'eglot
-    (add-to-list
-     'eglot-server-programs
-     '((tsx-ts-mode typescript-ts-mode js-mode js-jsx-mode js-ts-mode)
-       . ("rass"
-          "--"
-          "typescript-language-server" "--stdio"
-          ;; "--"
-          ;; "eslint-lsp" "--stdio"
-          "--"
-          "tailwindcss-language-server" "--stdio"))))
-
   :bind (:map
          eglot-mode-map
          ("C-c l a" . eglot-code-actions)
@@ -373,6 +361,12 @@
          ("C-c l r" . eglot-rename)
          ("C-c l i" . eglot-inlay-hints-mode)
          ("C-c l f" . eglot-format)))
+
+(use-package eglot-booster
+  :vc (:url "https://github.com/jdtsmith/eglot-booster" :branch "main")
+  :ensure t
+  :after eglot
+  :config	(eglot-booster-mode))
 
 (use-package project
   :ensure nil
@@ -486,6 +480,7 @@
           ("Agir Saglam" "https://www.youtube.com/feeds/videos.xml?channel_id=UCXH9dxtCeB3Gn_QnWnBJaTQ" nil 3600)
           ("Omnibus" "https://www.youtube.com/feeds/videos.xml?channel_id=UCmZUVTP8dtWqmsVhqt7tPEQ" nil 3600)
           ("Luke Smith" "https://www.youtube.com/feeds/videos.xml?channel_id=UC2eYFnH61tmytImy1mTYvhA" nil 3600)
+          ("The PrimeTime" "https://www.youtube.com/feeds/videos.xml?channel_id=UC8ENHE5xdFSwx71u3fDH5Xw" nil 3600)
           ("Joshua Blais Youtube" "https://www.youtube.com/feeds/videos.xml?channel_id=UC1tV5SjRyejRGeHAaMGYSsQ" nil 3600))))
 
 (use-package tab-bar
@@ -555,6 +550,10 @@
                (list "--config" (expand-file-name ".prettierrc" config))
              '())))
   :lighter " Prettier")
+  (reformatter-define odinfmt-format
+    :program "odinfmt"
+    :args '("-stdin")
+    :lighter " Odinfmt")
   (reformatter-define gofumpt-format
     :program "gofumpt"
     :args '()
@@ -611,6 +610,18 @@
 ;; (use-package nix-mode
 ;;   :ensure t
 ;;   :mode "\\.nix\\'")
+
+(use-package odin-ts-mode
+  :vc (:url "https://github.com/Sampie159/odin-ts-mode.git" :branch "master")
+  :ensure t
+  :hook
+  (odin-ts-mode . odinfmt-format-on-save-mode)
+  (odin-ts-mode . (lambda ()
+                    (setq-local tab-width 2)
+                    (setq-local js-indent-level 2)))
+  :config
+  (add-to-list 'treesit-language-source-alist '(odin "https://github.com/tree-sitter-grammars/tree-sitter-odin" "master" "src"))
+  :mode "\\.odin\\'")
 
 (use-package treesit-auto
   :custom
@@ -745,11 +756,16 @@
   :vc (:url "https://github.com/akermu/emacs-libvterm" :branch "master")
   :ensure t)
 
-;; External theme
-(use-package gruvbox-theme
+;; External themes
+(use-package nord-theme
   :ensure t
   :init
-  (load-theme 'gruvbox t))
+  (if (daemonp)
+      (add-hook 'after-make-frame-functions
+                (lambda (frame)
+                  (with-selected-frame frame
+                    (load-theme 'nord t))))
+    (load-theme 'nord t)))
 
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)

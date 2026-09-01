@@ -1,6 +1,7 @@
 /* See LICENSE file for copyright and license details. */
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "../slstatus.h"
 #include "../util.h"
@@ -19,6 +20,13 @@
 	#define POWER_SUPPLY_ENERGY   "/sys/class/power_supply/%s/energy_now"
 	#define POWER_SUPPLY_CURRENT  "/sys/class/power_supply/%s/current_now"
 	#define POWER_SUPPLY_POWER    "/sys/class/power_supply/%s/power_now"
+
+	const char notify_cmd[] = "notify-send";
+	const char battery_str[] = "Battery";
+	int last_notified_level = 0;
+
+	extern const int notifiable_levels[];
+	extern const size_t notifiable_levels_count;
 
 	static const char *
 	pick(const char *bat, const char *f1, const char *f2, char *path,
@@ -48,6 +56,45 @@
 
 		return bprintf("%d", cap_perc);
 	}
+
+const char *battery_notify(const char *bat)
+{
+	int cap_perc;
+	char state[12];
+	char path[PATH_MAX];
+
+	if (esnprintf(path, sizeof(path), POWER_SUPPLY_CAPACITY, bat) < 0 || pscanf(path, "%d", &cap_perc) != 1)
+		return NULL;
+
+	if (esnprintf(path, sizeof(path), POWER_SUPPLY_STATUS, bat) < 0 || pscanf(path, "%12[a-zA-Z ]", &state) != 1)
+		return NULL;
+
+	if (strcmp("Charging", state) == 0) {
+		last_notified_level = 0;
+		return NULL;
+	}
+
+	if (strcmp("Discharging", state) != 0)
+		return NULL;
+
+	char cmd[28];
+
+	for (size_t i = 0; i < notifiable_levels_count; i++) {
+		if (notifiable_levels[i] != cap_perc)
+			continue;
+
+		if (notifiable_levels[i] != last_notified_level) {
+			last_notified_level = notifiable_levels[i];
+
+			snprintf(cmd, sizeof(cmd), "%s %s %d%%", notify_cmd, battery_str, cap_perc);
+			system(cmd);
+
+			break;
+		}
+	}
+
+	return NULL;
+}
 
 	const char *
 	battery_state(const char *bat)

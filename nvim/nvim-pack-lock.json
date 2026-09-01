@@ -1,14 +1,22 @@
 {
   "plugins": {
+    "Comment.nvim": {
+      "rev": "e30b7f2008e52442154b66f7c519bfd2f1e32acb",
+      "src": "https://github.com/numToStr/Comment.nvim"
+    },
     "LuaSnip": {
       "rev": "642b0c595e11608b4c18219e93b88d7637af27bc",
       "src": "https://github.com/L3MON4D3/LuaSnip",
       "version": "2.0.0 - 3.0.0"
     },
+    "badwolf": {
+      "rev": "585229900fc5beaa9df14f7734cde0f1e1524bd3",
+      "src": "https://github.com/sjl/badwolf"
+    },
     "blink.cmp": {
       "rev": "78336bc89ee5365633bcf754d93df01678b5c08f",
       "src": "https://github.com/saghen/blink.cmp",
-      "version": "1.0.0 - 2.0.0"
+      "version": "2.0.0 - 3.0.0"
     },
     "command.nvim": {
       "rev": "e3d2c3923b37980deaf36221044219d9f78348b4",

@@ -20,5 +20,11 @@
 (tool-bar-mode 0)
 (tooltip-mode  0)
 (scroll-bar-mode 0)
+(setq native-comp-async-report-warnings-errors 'silent
+      native-comp-jit-compilation t)
+(setq-default bidi-display-reordering 'left-to-right
+              bidi-paragraph-direction 'left-to-right)
+(setq bidi-inhibit-bpa t)
+(setq redisplay-skip-fontification-on-input t)
 
 ;;; early-init.el ends here

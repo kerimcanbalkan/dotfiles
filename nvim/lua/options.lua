@@ -90,3 +90,8 @@ vim.o.expandtab = true
 vim.o.guicursor = "n-v-c:block,i:block"
 
 vim.cmd.colorscheme 'habamax'
+vim.o.winborder = "single"
+
+-- Set floating window border color
+vim.api.nvim_set_hl(0, "FloatBorder", { bg = "NONE" })
+vim.api.nvim_set_hl(0, "NormalFloat", { bg = "NONE" })

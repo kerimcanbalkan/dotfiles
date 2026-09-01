@@ -23,13 +23,13 @@ static const char *colors[][3] = {
 static const char *tags[] = {"1", "2", "3", "4", "5", "6"};
 
 static const Rule rules[] = {
-  /* xprop(1):
-   *	WM_CLASS(STRING) = instance, class
-   *	WM_NAME(STRING) = title
-   */
-  /* class      instance    title       tags mask     isfloating   monitor */
-  { "Gimp",     NULL,       NULL,       0,            1,           -1 },
-  { "Firefox",  NULL,       NULL,       1 << 8,       0,           -1 },
+    /* xprop(1):
+     *	WM_CLASS(STRING) = instance, class
+     *	WM_NAME(STRING) = title
+     */
+    /* class      instance    title       tags mask     isfloating   monitor */
+    {"Gimp", NULL, NULL, 0, 1, -1},
+    {"Firefox", NULL, NULL, 1 << 8, 0, -1},
 };
 
 /* layout(s) */
@@ -75,8 +75,7 @@ static const char *colorpickercmd[] = {
     "/home/kerim/dotfiles/scripts/color-picker.sh", NULL};
 static const char *wallpaperselectorcmd[] = {
     "/home/kerim/dotfiles/scripts/wallpaper-selector.sh", NULL};
-static const char *passmenucmd[] = {"passmenu",
-                                    NULL};
+static const char *passmenucmd[] = {"passmenu", NULL};
 static const char *upbrightness[] = {"brightnessctl", "set", "+5%", NULL};
 static const char *downbrightness[] = {"brightnessctl", "set", "5%-", NULL};
 static const char *volumeUp[] = {"pactl", "set-sink-volume", "@DEFAULT_SINK@",
@@ -85,13 +84,18 @@ static const char *volumeDown[] = {"pactl", "set-sink-volume", "@DEFAULT_SINK@",
                                    "-5%", NULL};
 static const char *volumeMute[] = {"pactl", "set-sink-mute", "@DEFAULT_SINK@",
                                    "toggle", NULL};
-static const char *screenshotcmd[] = {"/home/kerim/dotfiles/scripts/capture.sh", NULL};
+static const char *screenshotcmd[] = {"/home/kerim/dotfiles/scripts/capture.sh",
+                                      NULL};
+static const char *rebootsystem[] = {"loginctl", "reboot", NULL};
+static const char *poweroff[] = {"loginctl","poweroff", NULL};
 
 static const Key keys[] = {
     /* modifier                     key        function        argument */
     {MODKEY, XK_p, spawn, {.v = dmenucmd}},
     {MODKEY, XK_Return, spawn, {.v = termcmd}},
     {MODKEY, XK_w, spawn, {.v = wallpaperselectorcmd}},
+    {MODKEY | ShiftMask, XK_r, spawn, {.v = rebootsystem}},
+    {MODKEY | ShiftMask, XK_o, spawn, {.v = poweroff}},
     {MODKEY | ShiftMask, XK_p, spawn, {.v = passmenucmd}},
     {MODKEY, XK_c, spawn, {.v = colorpickercmd}},
     {MODKEY, XK_e, spawn, {.v = emacscmd}},

@@ -176,6 +176,7 @@ local servers = {
       },
     },
   },
+  ols = {},
   -- rust_analyzer = {},
   --
   -- Some languages (like typescript) have entire language plugins that can be useful:
@@ -269,6 +270,7 @@ require('conform').setup {
       typescriptreact = true,
       javascriptreact = true,
       go = true,
+      odin = true,
     }
     if enabled_filetypes[vim.bo[bufnr].filetype] then
       return { timeout_ms = 500 }
@@ -291,6 +293,7 @@ require('conform').setup {
     javascriptreact = { "prettier", stop_after_first = true },
     typescriptreact = { "prettier", stop_after_first = true },
     go = { "gofmt", "goimports"},
+    odin = { "odinfmt" },
   },
 }
 
@@ -304,7 +307,7 @@ vim.pack.add { { src = gh 'L3MON4D3/LuaSnip', version = vim.version.range '2.*' 
 require('luasnip').setup {}
 
 -- [[ Autocomplete Engine ]]
-vim.pack.add { { src = gh 'saghen/blink.cmp', version = vim.version.range '1.*' } }
+vim.pack.add { { src = gh 'saghen/blink.cmp', version = vim.version.range '2.*' } }
 require('blink.cmp').setup {
   keymap = {
     ["<C-j>"] = { "select_and_accept" },
@@ -381,9 +384,10 @@ vim.api.nvim_create_autocmd('FileType', {
 vim.pack.add { gh 'windwp/nvim-autopairs' }
 require('nvim-autopairs').setup { }
 
-vim.pack.add({
-    { src = "https://github.com/ibhagwan/fzf-lua" },
-})
+vim.pack.add { gh "numToStr/Comment.nvim"}
+require('Comment').setup()
+
+vim.pack.add { gh "ibhagwan/fzf-lua" }
 local actions = require('fzf-lua.actions')
 require('fzf-lua').setup({
     winopts = { backdrop = 85 },
