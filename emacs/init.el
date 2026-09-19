@@ -7,25 +7,6 @@
 ;;; Commentary:
 ;; This is my personal GNU Emacs configuration, I mostly try to use native packages rather than relying on external ones.  An keep it as simple as possible.
 
-;; Initialize package archives
-(require 'package)
-
-;; Comment/uncomment this line to enable MELPA Stable if desired.  See `package-archive-priorities`
-;; and `package-pinned-packages`. Most users will not need or want to do this.
-(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
-(package-initialize)
-
-;; Load my custom functions
-(load (expand-file-name "kerim.el" user-emacs-directory))
-
-;; Hopefully read environment variables
-(use-package exec-path-from-shell
-  :ensure t
-  :config
-  ;; Add GPG_AGENT_INFO to the list of variables to import
-  (setq exec-path-from-shell-variables '("PATH" "MANPATH" "GPG_AGENT_INFO" "SSH_AUTH_SOCK"))
-  (exec-path-from-shell-initialize))
-
 ;;; Code:
 (use-package emacs
   :ensure nil
@@ -89,17 +70,14 @@
    ("C-c l" . org-store-link)
    ("C-c a" . org-agenda)
    ("C-c c" . org-capture))
-  :init
-
   :config
+  ;; Transparency
+  (add-to-list 'default-frame-alist '(alpha-background . 90))
   ;; Disable blinking cursor
   (blink-cursor-mode -1)
 
-  (setq treesit-extra-load-path '("~/.config/emacs/tree-sitter"))
-  ;; Transparency
-  (add-to-list 'default-frame-alist '(alpha-background . 90))
-
   ;; Disable bidirectional text scanning
+  ;; This improves performance
   (setq-default bidi-display-reordering 'left-to-right
                 bidi-paragraph-direction 'left-to-right)
   (setq bidi-inhibit-bpa t)
@@ -129,48 +107,49 @@
   (tool-bar-mode -1)           ;; Disable the tool bar for a cleaner interface.
   (menu-bar-mode -1)           ;; Disable the menu bar for a more streamlined look.
   (tooltip-mode -1)
-
-  (when scroll-bar-mode
-    (scroll-bar-mode -1))      ;; Disable the scroll bar if it is active.
-
   (global-auto-revert-mode 1)  ;; Enable global auto-revert mode to keep buffers up to date with their corresponding files.
   (recentf-mode 1)             ;; Enable tracking of recently opened files.
   (savehist-mode 1)            ;; Enable saving of command history.
   (save-place-mode 1)          ;; Enable saving the place in files for easier return.
   (winner-mode 1)              ;; Enable winner mode to easily undo window configuration changes.
   (file-name-shadow-mode 1)    ;; Enable shadowing of filenames for clarity.
+  (load-theme 'modus-vivendi-deuteranopia)     ;; Load dark theme
 
   ;; Set the default coding system for files to UTF-8.
-  (modify-coding-system-alist 'file "" 'utf-8)
-  (setq-default mode-line-format
-                '((:eval
-                   (let* ((branch (when vc-mode (string-trim (substring vc-mode 5))))
-                          ;; format-mode-line cleans up the 'mode-name' list/string
-                          (mode-str (format-mode-line mode-name))
-                          ;; Truncate the mode name if it's longer than 12 chars to save space
-                          (mode (if (> (length mode-str) 12)
-                                    (format "[%s…]" (substring mode-str 0 10))
-                                  (format "[%s]" mode-str)))
-                          ;; Prepare the left side
-                          (left (format " %s " (buffer-name)))
-                          ;; Prepare the right side
-                          (right (format "%s %s%s  %d:%d "
-                                         mode
-                                         (if branch " " "")
-                                         (or branch "")
-                                         (line-number-at-pos)
-                                         (current-column)))
-                          ;; Calculate the available empty space
-                          (available-width (- (window-total-width)
-                                              (length left)
-                                              (length right))))
-                     (append (list left)
-                             (list (propertize " " 'display `(space :align-to (- right ,(length right)))))
-                             (list right))))))
-  )
+  (modify-coding-system-alist 'file "" 'utf-8))
 
-  (defun my-select-window (window)
-        (select-window window))
+(use-package completion-preview
+  :ensure nil
+  :demand t
+  :bind
+  ( :map completion-preview-active-mode-map
+    ("M-i" . completion-preview-insert-word)
+    ("M-n" . completion-preview-next-candidate)
+    ("M-p" . completion-preview-prev-candidate)
+    ("M-<return>" . completion-preview-insert)
+    ("<tab>" . completion-preview-complete))
+  :config
+  (setq completion-preview-minimum-symbol-length 2)
+  (with-eval-after-load 'org
+    (add-to-list 'completion-preview-commands #'org-self-insert-command))
+  (global-completion-preview-mode 1))
+
+
+(use-package minibuffer
+  :ensure nil
+  :demand t
+  :bind
+  ( :map completion-in-region-mode-map
+    ("M-i" . minibuffer-choose-completion)
+    ("M-n" . minibuffer-next-completion)
+    ("M-p" . minibuffer-previous-completion))
+  :config
+  (setq completions-format 'one-column)
+  (setq completions-max-height 12)
+  (setq completion-auto-help t)
+  (setq completion-auto-select nil)
+  (setq minibuffer-visible-completions t)
+  (setq completion-eager-update t))
 
 (use-package window
   :ensure nil
@@ -193,7 +172,7 @@
       (window-width . 100)
       (side . right)
       (slot . 1))
-     ("\\*\\(Flymake diagnostics\\|Completions\\)"
+     ("\\*Flymake diagnostics\\*" ;; Removed \\|Completions
       (display-buffer-in-side-window)
       (window-height . 0.25)
       (side . bottom)
@@ -214,27 +193,66 @@
   (eldoc-echo-area-use-multiline-p t)
   (eldoc-documentation-strategy #'eldoc-documentation-compose))
 
-(use-package dired
+(use-package icomplete
+  :bind (:map icomplete-minibuffer-map
+              ("C-n" . icomplete-forward-completions)
+              ("C-p" . icomplete-backward-completions)
+              ("RET" . exit-minibuffer))
+  :hook
+  (after-init . (lambda ()
+                  (fido-mode -1)
+                  (icomplete-vertical-mode 1)
+                  ))
+  :config
+  (setq icomplete-delay-completions-threshold 0)
+  (setq completion-auto-select nil)
+  (setq icomplete-compute-delay 0)
+  (setq icomplete-show-matches-on-no-input t)
+  (setq icomplete-hide-common-prefix nil)
+  (setq icomplete-prospects-height 10)
+  (setq icomplete-separator " . ")
+  (setq icomplete-with-completion-tables t)
+  (setq icomplete-max-delay-chars 0)
+  (setq icomplete-scroll t))
+
+(use-package project
+  :ensure nil
+  :bind (("C-x p p" . project-switch-project)
+         ("C-x p f" . project-find-file)
+         ("C-x p d" . project-dired)
+         ("C-x p g" . project-find-regexp)
+         ("C-x p b" . project-switch-to-buffer)
+         ("C-x p k" . project-kill-buffers)))
+
+(use-package eglot
   :ensure nil
   :custom
-  (dired-create-destination-dirs 'ask))
+  (eglot-autoshutdown t)
+  (eglot-events-buffer-size 0) ;; EMACS-31 -- do we still need it?
+  (eglot-events-buffer-config '(:size 0 :format full))
+  (eglot-prefer-plaintext nil)
+  (jsonrpc-event-hook nil)
+  (eglot-code-action-indications nil) ;; EMACS-31 -- annoying as hell
+  :init
+  (fset #'jsonrpc--log-event #'ignore)
 
-;;; │ MAN
-(use-package man
-  :ensure nil
-  :commands (man)
-  :config
-  (setq Man-notify-method 'pushy))
+  (setq-default eglot-workspace-configuration (quote
+                                               (:gopls (:hints (:parameterNames t)))))
 
-(use-package isearch
-  :ensure nil
-  :config
-  (setq isearch-lazy-count t)                  ;; Enable lazy counting to show current match information.
-  (setq lazy-count-prefix-format "(%s/%s) ")   ;; Format for displaying current match count.
-  (setq lazy-count-suffix-format nil)          ;; Disable suffix formatting for match count.
-  (setq search-whitespace-regexp ".*?")        ;; Allow searching across whitespace.
-  :bind (("C-s" . isearch-forward)             ;; Bind C-s to forward isearch.
-         ("C-r" . isearch-backward)))          ;; Bind C-r to backward isearch.
+  (defun my/eglot-setup ()
+    "Setup eglot mode with specific exclusions."
+    (unless (memq major-mode '(emacs-lisp-mode lisp-mode))
+      (eglot-ensure)))
+
+  (add-hook 'prog-mode-hook #'my/eglot-setup)
+
+  :bind (:map
+         eglot-mode-map
+         ("C-c l a" . eglot-code-actions)
+         ("C-c l o" . eglot-code-action-organize-imports)
+         ("C-c l r" . eglot-rename)
+         ("C-c l i" . eglot-inlay-hints-mode)
+         ("C-c l f" . eglot-format)))
 
 (use-package flymake
   :ensure nil
@@ -267,12 +285,6 @@
   (setq uniquify-buffer-name-style 'forward)
   (setq uniquify-strip-common-suffix t)
   (setq uniquify-after-kill-buffer-p t))
-
-(use-package which-key
-  :ensure nil
-  :defer t
-  :hook
-  (after-init . which-key-mode))
 
 (use-package whitespace
   :ensure nil
@@ -307,141 +319,6 @@
       (file+headline "~/org/events.org" "Events")
       "* %?\n%^{When}t\n"))))
 
-(use-package icomplete
-  :bind (:map icomplete-minibuffer-map
-              ("C-n" . icomplete-forward-completions)
-              ("C-p" . icomplete-backward-completions)
-              ("RET" . exit-minibuffer))
-  :hook
-  (after-init . (lambda ()
-                  (fido-mode -1)
-                  (icomplete-vertical-mode 1)
-                  ))
-  :config
-  (setq icomplete-delay-completions-threshold 0)
-  (setq completion-auto-select nil)
-  (setq icomplete-compute-delay 0)
-  (setq icomplete-show-matches-on-no-input t)
-  (setq icomplete-hide-common-prefix nil)
-  (setq icomplete-prospects-height 10)
-  (setq icomplete-separator " . ")
-  (setq icomplete-with-completion-tables t)
-  (setq icomplete-max-delay-chars 0)
-  (setq icomplete-scroll t))
-
-
-
-;; Setup lsp
-(use-package eglot
-  :ensure nil
-  :custom
-  (eglot-autoshutdown t)
-  (eglot-events-buffer-size 0) ;; EMACS-31 -- do we still need it?
-  (eglot-events-buffer-config '(:size 0 :format full))
-  (eglot-prefer-plaintext nil)
-  (jsonrpc-event-hook nil)
-  (eglot-code-action-indications nil) ;; EMACS-31 -- annoying as hell
-  :init
-  (fset #'jsonrpc--log-event #'ignore)
-
-  (setq-default eglot-workspace-configuration (quote
-                                               (:gopls (:hints (:parameterNames t)))))
-
-  (defun my/eglot-setup ()
-    "Setup eglot mode with specific exclusions."
-    (unless (memq major-mode '(emacs-lisp-mode lisp-mode))
-      (eglot-ensure)))
-
-  (add-hook 'prog-mode-hook #'my/eglot-setup)
-
-  :bind (:map
-         eglot-mode-map
-         ("C-c l a" . eglot-code-actions)
-         ("C-c l o" . eglot-code-action-organize-imports)
-         ("C-c l r" . eglot-rename)
-         ("C-c l i" . eglot-inlay-hints-mode)
-         ("C-c l f" . eglot-format)))
-
-(use-package eglot-booster
-  :vc (:url "https://github.com/jdtsmith/eglot-booster" :branch "main")
-  :ensure t
-  :after eglot
-  :config	(eglot-booster-mode))
-
-(use-package project
-  :ensure nil
-  :bind (("C-x p p" . project-switch-project)
-         ("C-x p f" . project-find-file)
-         ("C-x p d" . project-dired)
-         ("C-x p g" . project-find-regexp)
-         ("C-x p b" . project-switch-to-buffer)
-         ("C-x p k" . project-kill-buffers)))
-
-;; Coding
-(use-package go-ts-mode
-  :mode "\\.go\\'"
-  :ensure nil
-  :hook ((go-ts-mode . my/go-setup)
-         (go-ts-mode . gofumpt-format-on-save-mode)
-         (go-ts-mode . goimports-format-on-save-mode))
-  :config
-  (defun my/go-setup ()
-    "Set Go indentation"
-    (setq-local indent-tabs-mode t)
-    (setq-local tab-width 8)))
-
-
-(use-package js-ts-mode
-  :ensure nil
-  :hook (js-ts-mode . prettier-format-on-save-mode)
-  :config
-  (add-to-list 'treesit-language-source-alist '(javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src"))
-  (add-to-list 'treesit-language-source-alist '(jsdoc "https://github.com/tree-sitter/tree-sitter-jsdoc" "master" "src"))
-  :mode "\\.js\\'")
-
-(use-package js-json-mode
-  :ensure nil
-  :custom
-  (tab-width 2))
-
-(use-package tsx-ts-mode
-  :ensure nil
-  :hook (tsx-ts-mode . prettier-format-on-save-mode)
-  :custom
-  (tab-width 2)
-  :config
-  (add-to-list 'treesit-language-source-alist '(tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src"))
-  :mode "\\.tsx\\'")
-
-(use-package typescript-ts-mode
-  :ensure nil
-  :hook (typescript-ts-mode . prettier-format-on-save-mode)
-  :custom
-  (typescript-ts-mode-indent-offset 2)
-  :config
-  (add-to-list 'treesit-language-source-alist '(typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src"))
-  :mode "\\.ts\\'")
-
-(use-package html-ts-mode
-  :ensure nil
-  :hook (html-ts-mode . prettier-format-on-save-mode)
-  :mode "\\.html\\'")
-
-(use-package css-ts-mode
-  :ensure nil
-  :hook (css-ts-mode . prettier-format-on-save-mode)
-  :mode "\\.css\\'")
-
-(use-package slime
-  :ensure t
-  :defer t
-  :init
-  (setq inferior-lisp-program "clisp")
-  :config
-  (setq slime-lisp-implementations '((clisp ("clisp"))))
-  (slime-setup '(slime-fancy)))
-
-;; Reading News
 (use-package newsticker
   :ensure nil
   :custom
@@ -483,230 +360,8 @@
           ("The PrimeTime" "https://www.youtube.com/feeds/videos.xml?channel_id=UC8ENHE5xdFSwx71u3fDH5Xw" nil 3600)
           ("Joshua Blais Youtube" "https://www.youtube.com/feeds/videos.xml?channel_id=UC1tV5SjRyejRGeHAaMGYSsQ" nil 3600))))
 
-(use-package tab-bar
-  :ensure nil
-  :hook (after-init . tab-bar-mode)
-  :custom
-  (tab-bar-show nil))
-
 ;;; External Packages
-
-;; Completion
-(use-package orderless
-  :ensure t
-  :custom
-  (completion-styles '(orderless basic))
-  (completion-category-overrides '((file (styles partial-completion))))
-  (completion-pcm-leading-wildcard t)) ;; Emacs 31: partial-completion behaves like substring
-
-;; Note Taking
-(use-package denote
-  :ensure t
-  :hook (dired-mode . denote-dired-mode)
-  :bind
-  (("C-c n n" . denote)
-   ("C-c n r" . denote-rename-file)
-   ("C-c n l" . denote-link)
-   ("C-c n b" . denote-backlinks)
-   ("C-c n d" . denote-dired)
-   ("C-c n g" . denote-grep))
-  :config
-  (setq denote-directory (expand-file-name "~/notes/"))
-  (denote-rename-buffer-mode 1))
-
-;; A collection of ridiculously useful extensions
-(use-package crux
-  :ensure t
-  :config
-  (global-set-key [remap move-beginning-of-line] #'crux-move-beginning-of-line)
-  (global-set-key (kbd "C-c o") #'crux-open-with)
-  (global-set-key (kbd "C-c v") #'crux-duplicate-current-line-or-region)
-  (global-set-key (kbd "C-c s") #'crux-sudo-edit)
-  (global-set-key (kbd "C-c d t") #'crux-insert-date)
-  (global-set-key [(shift return)] #'crux-smart-open-line)
-  (global-set-key (kbd "s-r") #'crux-recentf-ido-find-file)
-  (global-set-key (kbd "C-<backspace>") #'crux-kill-line-backwards)
-  (global-set-key [remap kill-whole-line] #'crux-kill-whole-line))
-
-;; Fix Emacs's weird undo mechanism
-(use-package undo-fu
-  :ensure t)
-(use-package undo-fu-session
-  :ensure t
-  :config
-  (undo-fu-session-global-mode))
-
-(use-package reformatter
-  :ensure t
-  :config
-  (reformatter-define prettier-format
-  :program "prettier"
-  :args (let ((config (locate-dominating-file default-directory ".prettierrc"))
-              ;; Get the current file name or a fallback if the buffer isn't saved
-              (file-name (or (buffer-file-name) "index.js")))
-          (append
-           (list "--stdin-filepath" file-name)
-           (if config
-               (list "--config" (expand-file-name ".prettierrc" config))
-             '())))
-  :lighter " Prettier")
-  (reformatter-define odinfmt-format
-    :program "odinfmt"
-    :args '("-stdin")
-    :lighter " Odinfmt")
-  (reformatter-define gofumpt-format
-    :program "gofumpt"
-    :args '()
-    :lighter " Gofumpt")
-  (reformatter-define goimports-format
-    :program "goimports"
-    :args '()
-    :lighter " Gimp"))
-
-
-;; Editing Enhancement
-(use-package multiple-cursors
-  :ensure t
-  :config
-  (global-set-key (kbd "C-c e e") 'mc/edit-lines)
-  (global-set-key (kbd "C-c e w") 'mc/mark-next-like-this-word)
-  (global-set-key (kbd "C-c e t") 'mc/mark-next-like-this))
-
-(use-package avy
-  :ensure t
-  :config
-  (global-set-key (kbd "C-c C-j") 'avy-resume)
-  (global-set-key (kbd "M-g e") 'avy-goto-word-0)
-  (global-set-key (kbd "M-g w") 'avy-goto-word-1)
-  (global-set-key (kbd "M-g f") 'avy-goto-line)
-  (global-set-key (kbd "M-j") 'avy-goto-char-in-line))
-
-(use-package expand-region
-  :ensure t
-  :bind ("C-=" . er/expand-region))
-
-;; Completion
-(use-package corfu
-  :ensure t
-  :custom
-  (corfu-auto t)
-  (corfu-auto-prefix 2)
-  (corfu-auto-delay 0.25)
-  (corfu-echo-documentation 0.5)
-  (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-  (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
-  (corfu-quit-no-match t)      ;; Never quit, even if there is no match
-  (corfu-preview-current nil)    ;; Disable current candidate preview
-  (corfu-preselect 'prompt)      ;; Preselect the prompt
-  (corfu-on-exact-match 'insert) ;; Configure handling of exact matches
-  :bind
-  (:map corfu-map
-        ("C-j" . corfu-insert))
-  :init
-  (global-corfu-mode)
-  (corfu-history-mode)
-  (corfu-popupinfo-mode))
-
-;; (use-package nix-mode
-;;   :ensure t
-;;   :mode "\\.nix\\'")
-
-(use-package odin-ts-mode
-  :vc (:url "https://github.com/Sampie159/odin-ts-mode.git" :branch "master")
-  :ensure t
-  :hook
-  (odin-ts-mode . odinfmt-format-on-save-mode)
-  (odin-ts-mode . (lambda ()
-                    (setq-local tab-width 2)
-                    (setq-local js-indent-level 2)))
-  :config
-  (add-to-list 'treesit-language-source-alist '(odin "https://github.com/tree-sitter-grammars/tree-sitter-odin" "master" "src"))
-  :mode "\\.odin\\'")
-
-(use-package treesit-auto
-  :custom
-  (treesit-auto-install 'prompt)
-  :config
-  (treesit-auto-add-to-auto-mode-alist 'all)
-  (global-treesit-auto-mode))
-
-(use-package diff-hl
-  :ensure t
-  :config
-  (global-diff-hl-mode))
-
-;; Display colorcodes colors on buffers
-(use-package rainbow-mode
-  :ensure t
-  :hook
-  (tsx-ts-mode . rainbow-mode)
-  (html-mode . rainbow-mode)
-  (css-mode . rainbow-mode)
-  :config
-  (rainbow-mode))
-
-(use-package conf-mode
-  :ensure nil
-  :mode ("\\.env\\..*\\'" "\\.env\\'")
-  :init
-  (add-to-list 'auto-mode-alist '("\\.env\\'" . conf-mode)))
-
-(use-package nov
-  :ensure t
-  :mode ("\\.epub\\'" . nov-mode)
-  :hook ((nov-mode . visual-line-mode)
-         (nov-mode . visual-fill-column-mode))
-  :config
-  (setq nov-text-width 80
-        visual-fill-column-center-text t))
-
-(use-package emms
-  :ensure t
-  :config
-  ;; Initialize the default EMMS setup
-  (emms-all)
-  (emms-default-players)
-
-  ;; Use MPV as the primary player
-  (setq emms-player-list '(emms-player-mpv))
-
-  ;; Set your music directory
-  (setq emms-source-file-default-directory "~/music/")
-
-  ;; Enable metadata caching for faster browsing
-  (setq emms-info-asynchronously t)
-  (setq emms-source-file-directory-tree-function 'emms-source-file-directory-tree-find)
-
-  ;; Keybindings for global control
-  :bind
-  (("C-c m g" . emms-play-directory)
-   ("C-c m d" . emms-play-dired)
-   ("C-c m p" . emms-pause)
-   ("C-c m s" . emms-stop)
-   ("C-c m n" . emms-next)
-   ("C-c m b" . emms-previous)
-   ("C-c m e" . emms-smart-browse)))
-
-(use-package magit
-  :ensure t
-  :defer t
-  :bind
-  (("C-c g" . magit-status)
-   ("C-c f" . magit-dispatch)))
-
-(use-package pinentry
-  :ensure t
-  :config
-  (setq epg-pinentry-mode 'loopback)
-  (pinentry-start))
-
-(use-package dtrt-indent
-  :ensure t
-  :config
-  (dtrt-indent-global-mode))
-
-;; Email setup
-(add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e/")
+;; Email Setup
 (require 'mu4e)
 
 (use-package mu4e
@@ -743,30 +398,4 @@
                         smtpmail-stream-type 'starttls
                         smtpmail-smtp-user "kerimcanbalkan@gmail.com"
                         smtpmail-auth-credentials "~/.authinfo.gpg"))
-;; Terminal emulator
-;;  Really wanted to try this but somehow crashes the whole emacs
-;; (use-package gterm
-;;   :vc (:url "https://github.com/rwc9u/emacs-libgterm" :branch "main")
-;;   :init
-;;   (setq gterm-always-compile-module t)
-;;   (setq gterm-shell "/bin/bash")
-;;   (setq gterm-mouse-scroll-lines 5))
-
-(use-package vterm
-  :vc (:url "https://github.com/akermu/emacs-libvterm" :branch "master")
-  :ensure t)
-
-;; External themes
-(use-package nord-theme
-  :ensure t
-  :init
-  (if (daemonp)
-      (add-hook 'after-make-frame-functions
-                (lambda (frame)
-                  (with-selected-frame frame
-                    (load-theme 'nord t))))
-    (load-theme 'nord t)))
-
-(put 'upcase-region 'disabled nil)
-(put 'downcase-region 'disabled nil)
-;;; init.el ends here
+(provide 'init)

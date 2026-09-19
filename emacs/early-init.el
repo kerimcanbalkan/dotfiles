@@ -1,6 +1,4 @@
-;;;  package --- Summary
-;;; early-init.el --- Early Init -*- lexical-binding: t; -*-
-
+;;; early-init.el --- Early Initialization -*- lexical-binding: t; -*-
 ;; Author: Kerimcan Balkan
 
 ;;; Commentary:
@@ -17,14 +15,23 @@
 (setq initial-major-mode 'org-mode)
 (setq-default indent-tabs-mode nil)
 (setq pop-up-windows nil)
+
 (tool-bar-mode 0)
-(tooltip-mode  0)
+(tooltip-mode 0)
 (scroll-bar-mode 0)
+
 (setq native-comp-async-report-warnings-errors 'silent
       native-comp-jit-compilation t)
 (setq-default bidi-display-reordering 'left-to-right
               bidi-paragraph-direction 'left-to-right)
 (setq bidi-inhibit-bpa t)
 (setq redisplay-skip-fontification-on-input t)
+
+(push '(menu-bar-lines . 0) default-frame-alist)
+(push '(tool-bar-lines . 0) default-frame-alist)
+(push '(vertical-scroll-bars . nil) default-frame-alist)
+(push '(horizontal-scroll-bars . nil) default-frame-alist)
+
+(push '(undecorated . t) default-frame-alist)
 
 ;;; early-init.el ends here
