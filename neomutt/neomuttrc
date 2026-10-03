@@ -1,0 +1,41 @@
+# --- Paths & Folders ---
+set folder = "~/mail"
+set spoolfile = "+INBOX"
+set postponed = "+/[Gmail].Drafts"
+set record = "+/[Gmail].Sent Mail"
+set trash = "+/[Gmail].Trash"
+
+# Define mailboxes for quick navigation (press 'c' then 'Tab')
+mailboxes "+INBOX" "+/[Gmail].Sent Mail" "+/[Gmail].Drafts" "+/[Gmail].Trash"
+# --- Basic Settings ---
+set sort = threads
+set sort_aux = last-date-received
+set charset = "utf-8"
+
+# Renderin mails
+auto_view text/html
+alternative_order text/plain text/html
+
+# --- Sync Macro ---
+# Press 'F5' to run mbsync in the background and refresh NeoMutt
+macro index <F5> "!mbsync -a<enter>" "Run mbsync"
+
+# --- Outgoing Mail (SMTP via Gmail) ---
+# Re-using your app password or GPG-encrypted credentials via pass/authinfo
+set realname = "Kerimcan Balkan"
+set from = "kerimcanbalkan@gmail.com"
+set smtp_url = "smtp://kerimcanbalkan@gmail.com@smtp.gmail.com:587/"
+
+# If you use pass / gpg for your password, NeoMutt can prompt or read it:
+# (Alternatively, you can use msmtp for sending mail, detailed in Step 2)
+set smtp_pass = "`gpg --quiet --decrypt ~/.password-store/gmail.pass.gpg`"
+set ssl_starttls = yes
+set ssl_force_tls = yes
+
+# --- Caching for Performance ---
+set header_cache = "~/.cache/mutt/headers"
+set message_cachedir = "~/.cache/mutt/bodies"
+
+set editor = "vis"
+set charset = "utf-8"
+startup-hook "mbsync -a"

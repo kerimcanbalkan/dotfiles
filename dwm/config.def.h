@@ -6,8 +6,8 @@ static const unsigned int gappx = 5;    /* gap pixel between windows */
 static const unsigned int snap = 32;    /* snap pixel */
 static const int showbar = 1;           /* 0 means no bar */
 static const int topbar = 1;            /* 0 means bottom bar */
-static const char *fonts[] = {"IosevkaTerm Nerd Font Mono:size=13"};
-static const char dmenufont[] = "IosevkaTerm Nerd Font Mono:size=13";
+static const char *fonts[] = {"FreeMono:size=14"};
+static const char dmenufont[] = "FreeMono:size=14";
 static const char col_gray1[] = "#000000";
 static const char col_gray2[] = "#000000";
 static const char col_gray3[] = "#ffffff";
@@ -74,10 +74,12 @@ static const char *emacscmd[] = {"emacsclient", "-c", "-n", "-a", "", NULL};
 static const char *colorpickercmd[] = {
     "/home/kerim/dotfiles/scripts/color-picker.sh", NULL};
 static const char *wallpaperselectorcmd[] = {
-    "/home/kerim/dotfiles/scripts/wallpaper-selector.sh", NULL};
+  "/home/kerim/dotfiles/scripts/wallpaper-selector.sh", NULL};
+static const char *displayselectorcmd[] = {
+    "/home/kerim/dotfiles/scripts/change-display.sh", NULL};
 static const char *passmenucmd[] = {"passmenu", NULL};
-static const char *upbrightness[] = {"brightnessctl", "set", "+5%", NULL};
-static const char *downbrightness[] = {"brightnessctl", "set", "5%-", NULL};
+static const char *upbrightness[] = {"light", "-A", "5", NULL};
+static const char *downbrightness[] = {"light", "-U", "5", NULL};
 static const char *volumeUp[] = {"pactl", "set-sink-volume", "@DEFAULT_SINK@",
                                  "+5%", NULL};
 static const char *volumeDown[] = {"pactl", "set-sink-volume", "@DEFAULT_SINK@",
@@ -85,6 +87,8 @@ static const char *volumeDown[] = {"pactl", "set-sink-volume", "@DEFAULT_SINK@",
 static const char *volumeMute[] = {"pactl", "set-sink-mute", "@DEFAULT_SINK@",
                                    "toggle", NULL};
 static const char *screenshotcmd[] = {"/home/kerim/dotfiles/scripts/capture.sh",
+                                      NULL};
+static const char *openbookcmd[] = {"/home/kerim/dotfiles/scripts/open-book.sh",
                                       NULL};
 static const char *rebootsystem[] = {"loginctl", "reboot", NULL};
 static const char *poweroff[] = {"loginctl","poweroff", NULL};
@@ -100,6 +104,8 @@ static const Key keys[] = {
     {MODKEY, XK_c, spawn, {.v = colorpickercmd}},
     {MODKEY, XK_e, spawn, {.v = emacscmd}},
     {MODKEY, XK_s, spawn, {.v = screenshotcmd}},
+    {MODKEY, XK_v, spawn, {.v = displayselectorcmd}},
+    {MODKEY, XK_o, spawn, {.v = openbookcmd}},
     {MODKEY, XK_b, togglebar, {0}},
     {MODKEY, XK_j, focusstack, {.i = +1}},
     {MODKEY, XK_k, focusstack, {.i = -1}},

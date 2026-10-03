@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+
+URL="$1"
+
+if echo "$URL" | grep -qE "(youtube\.com|youtu\.be)"; then
+    nohup mpv "$URL" > /dev/null 2>&1 &
+    else
+        librewolf --new-tab "$URL" > /dev/null 2>&1 &
+fi

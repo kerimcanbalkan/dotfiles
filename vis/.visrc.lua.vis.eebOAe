@@ -1,0 +1,43 @@
+require('vis')
+-- config --
+vis.events.subscribe(vis.events.INIT, function()
+  vis:command("set theme caelus") end)
+-- per-window
+vis.events.subscribe(vis.events.WIN_OPEN, function(win)
+	vis:command("set tabwidth 2")
+	vis:command("set relativenumbers true")
+	vis:command("set autoindent true")
+	vis:command("set showspaces false")
+	vis:command("set showtabs false")
+	vis:command("set expandtab on")
+	vis:command("set shell /usr/bin/env sh")
+	vis:command("set wrapcolumn false")
+	vis:command("set ignorecase true")
+	vis:map(vis.modes.VISUAL," y", '"+y"')
+	vis:map(vis.modes.NORMAL, " w", function() 
+	vis:command("w!")
+	end)
+	vis:map(vis.modes.NORMAL, " q", function() 
+	vis:command("q!")
+	end)
+	vis:map(vis.modes.NORMAL, ";f", function()
+		vis:command("fzf")
+		vis:feedkeys("<C-w>k")
+		vis:command("wq!")
+	end, "")
+end)
+
+
+-- plugins
+-- Fuzzy find
+local fzf = require('plugins/vis-fzf-open')
+-- vis-autoclose
+local autoclose = require('plugins/vis-autoclose')
+-- complete-filename
+local completefilename = require('plugins/complete-filename')
+-- vis-lspc
+local lsp = require('plugins/vis-lspc')
+lsp.show_message = "message"
+lsp.ls_map.clangd = {
+	formatting_options = {tabSize = 2, insertSpaces = false}
+}

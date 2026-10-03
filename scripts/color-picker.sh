@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-COLOR=$(grabc -hex)
+COLOR=$(grabc)
 
 [ -z "$COLOR" ] && exit 1
 

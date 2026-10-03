@@ -81,7 +81,7 @@ static const struct arg args[] = {
   { battery_perc,  "BAT: %s%%",    "BAT0" },
   { battery_state, " [%s] | ",       "BAT0" },
   { run_command, "VOL: %s | ", "pactl get-sink-volume @DEFAULT_SINK@ | awk '/Volume/ {print $5}'" },
-  { run_command, "BRT: %s | ", "brightnessctl -m | cut -d',' -f4" },
+  { run_command, "BRT: %s | ", "light | cut -d. -f1 | sed 's/$/%/'" },
   { datetime,       "%s ",                       "%H:%M:%S | %d.%m.%Y" },
   { battery_notify, "",       "BAT0" },
 };
