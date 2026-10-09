@@ -96,32 +96,32 @@ unsigned int tabspaces = 8;
 /* Terminal colors (16 first used in escape sequence) */
 static const char *colorname[] = {
   /* 8 normal colors */
-  "#000000", /* 0: black   (regular0) */
-  "#ff8059", /* 1: red     (regular1) */
-  "#44bc44", /* 2: green   (regular2) */
-  "#d0bc00", /* 3: yellow  (regular3) */
-  "#2fafff", /* 4: blue    (regular4) */
-  "#feacd0", /* 5: magenta (regular5) */
-  "#00d3d0", /* 6: cyan    (regular6) */
-  "#bfbfbf", /* 7: white   (regular7) */
+  "#0f100f", /* 0: black   - background, STYLE_NOTHING / COLOR_COLUMN */
+  "#d9725f", /* 1: red     - keywords, errors */
+  "#8fb573", /* 2: green   - strings */
+  "#efbf71", /* 3: yellow  - selection bg (= caelus lightyellow) */
+  "#7fa3c0", /* 4: blue    - identifiers */
+  "#c08cb5", /* 5: magenta - numbers */
+  "#7fbfb4", /* 6: cyan    - types, classes, constants */
+  "#d6d4c8", /* 7: white   - default text, operators, variables */
 
   /* 8 bright colors */
-  "#595959", /* 8:  bright black   (bright0) */
-  "#ef8b50", /* 9:  bright red     (bright1) */
-  "#70b900", /* 10: bright green   (bright2) */
-  "#c0c530", /* 11: bright yellow  (bright3) */
-  "#79a8ff", /* 12: bright blue    (bright4) */
-  "#b6a0ff", /* 13: bright magenta (bright5) */
-  "#6ae4b9", /* 14: bright cyan    (bright6) */
-  "#ffffff", /* 15: bright white   (bright7) */
+  "#6c756f", /* 8:  bright black   (= caelus line number gray) */
+  "#e8876f", /* 9:  bright red     */
+  "#a5c98a", /* 10: bright green   */
+  "#f5d08f", /* 11: bright yellow  */
+  "#96b8d4", /* 12: bright blue    */
+  "#d3a3c8", /* 13: bright magenta */
+  "#95d1c6", /* 14: bright cyan    */
+  "#ece9dc", /* 15: bright white   */
 
   [255] = 0,
 
   /* special colors */
-  "#ffffff", /* 256: default foreground */
-  "#000000", /* 257: default background */
-  "#ffffff", /* 258: cursor (matches foreground) */
-  "#000000", /* 259: reverse cursor (matches background) */
+  "#d6d4c8", /* 256: default foreground (= color 7) */
+  "#0f100f", /* 257: default background (= color 0) */
+  "#d6d4c8", /* 258: cursor */
+  "#0f100f", /* 259: reverse cursor */
 };
 
 /*
@@ -132,6 +132,7 @@ unsigned int defaultfg = 256;
 unsigned int defaultbg = 257;
 unsigned int defaultcs = 258;
 static unsigned int defaultrcs = 259;
+
 
 /*
  * Default shape of cursor

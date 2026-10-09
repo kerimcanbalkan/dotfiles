@@ -38,4 +38,3 @@ set message_cachedir = "~/.cache/mutt/bodies"
 
 set editor = "vis"
 set charset = "utf-8"
-startup-hook "mbsync -a"
